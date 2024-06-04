@@ -1,15 +1,15 @@
+// explore.dart
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tisad_shop_app/constants.dart';
+import 'package:tisad_shop_app/providers/cart_provider.dart';
+import '../models/product.dart';
+import '../theme.dart';
+import '../widgets/bottomNav.dart';
+import 'product_details.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:tisad_shop_app/constants.dart';
-import 'package:tisad_shop_app/models/product.dart';
-import 'package:tisad_shop_app/models/vendor.dart';
-import 'package:tisad_shop_app/screens/product_details.dart';
-import 'package:tisad_shop_app/theme.dart';
-import 'package:tisad_shop_app/widgets/bottomNav.dart';
-import 'package:http/http.dart' as http;
 class Explore extends StatefulWidget {
   final int currentIndex;
 
@@ -33,11 +33,7 @@ class _ExploreState extends State<Explore> {
     debugPrint('worked');
 
     if (response.statusCode == 200) {
-
-      // Decode the response body into a map
       Map<String, dynamic> responseData = json.decode(response.body);
-
-      // Extract the list of events from the map using the appropriate key
       List<dynamic> productData = responseData['data'];
 
       setState(() {
@@ -70,11 +66,10 @@ class _ExploreState extends State<Explore> {
             label: 'Account',
           ),
         ],
-        currentIndex: widget.currentIndex, // Index 2 corresponds to Explore
+        currentIndex: widget.currentIndex,
         selectedItemColor: lightColorScheme.primary,
         unselectedItemColor: Colors.black,
         onTap: (index) {
-          // Call the onItemTapped method from BottomNavLogic
           BottomNavLogic.onItemTapped(context, index);
         },
       ),
@@ -106,8 +101,8 @@ class _ExploreState extends State<Explore> {
                   Expanded(
                     child: TextField(
                       decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(vertical: 10,horizontal: 10),
-                        hintText: ' Search products...',
+                        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        hintText: 'Search products...',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
@@ -115,7 +110,6 @@ class _ExploreState extends State<Explore> {
                           icon: Icon(Icons.filter_list),
                           onPressed: () {
                             // Handle filter icon tap
-                            // You can show a filter dialog or navigate to a filter screen here
                           },
                         ),
                       ),
@@ -123,18 +117,16 @@ class _ExploreState extends State<Explore> {
                   ),
                 ],
               ),
-              SizedBox(height: 20,),
+              SizedBox(height: 20),
               Container(
                 height: 900,
                 width: double.infinity,
                 child: ListView.builder(
-                  itemCount:product.length,
+                  itemCount: product.length,
                   itemBuilder: (context, index) {
                     return InkWell(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder:
-                            (context)=> ProductDetails(currentIndex: 2, p_index: product[index].id.toString(),)
-                        ));
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetails(currentIndex: 2, p_index: product[index].id.toString())));
                       },
                       child: Card(
                         child: Container(
@@ -155,54 +147,58 @@ class _ExploreState extends State<Explore> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              SizedBox(height: 10,),
-                              Text(product[index].p_name ?? 'Null',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold
-                                ),
+                              SizedBox(height: 10),
+                              Text(
+                                product[index].p_name ?? 'Null',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 10,),
+                              SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   RichText(
                                     text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                              text: product[index].price ?? '',
-                                              style: TextStyle(
-                                                  fontSize: 17,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold
-                                              )
-                                          ),
-                                          WidgetSpan(
-                                            child: SizedBox(width: 1,)
-                                          ),
-                                          TextSpan(
-                                              text: 'KES',style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.black,
-                                          )
-                                          ),
-                                        ]
+                                      children: [
+                                        TextSpan(
+                                          text: product[index].price.toString(),
+                                          style: TextStyle(fontSize: 17, color: Colors.black, fontWeight: FontWeight.bold),
+                                        ),
+                                        WidgetSpan(
+                                          child: SizedBox(width: 1),
+                                        ),
+                                        TextSpan(
+                                          text: 'KES',
+                                          style: TextStyle(fontSize: 10, color: Colors.black),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  Container(
-                                    height: 35,
-                                    width: 35,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50),
-                                      color: lightColorScheme.primary,
+                                  InkWell(
+                                    onTap: () {
+                                      Provider.of<CartProvider>(context, listen: false).addItem(product[index]);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('${product[index].p_name} added to cart'),
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      height: 35,
+                                      width: 35,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        color: lightColorScheme.primary,
+                                      ),
+                                      child: Icon(
+                                        Icons.add_shopping_cart_outlined,
+                                        size: 21,
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                    child: Icon(Icons.add_shopping_cart_outlined,
-                                      size: 21,
-                                      color: Colors.white,
-                                    ),
-                                  )
+                                  ),
                                 ],
-                              )
+                              ),
                             ],
                           ),
                         ),
@@ -210,8 +206,7 @@ class _ExploreState extends State<Explore> {
                     );
                   },
                 ),
-              )
-
+              ),
             ],
           ),
         ),

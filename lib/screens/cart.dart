@@ -18,8 +18,10 @@ class CartScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.shopping_cart),
             onPressed: () {
-              Navigator.of(context).pop();
-            },
+              Navigator.push(context, MaterialPageRoute(builder:
+                  (context)=> CartScreen()
+              ));
+              },
           ),
         ],
       ),

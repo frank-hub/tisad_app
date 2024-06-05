@@ -126,13 +126,13 @@ class _HomeState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding: const EdgeInsets.only(top: 15),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                        width: 120,
-                        child: const Text('EXPLORE SHOP',
+                        width: 200,
+                        child: const Text('EXPLORE SHOPS',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w900
@@ -144,10 +144,14 @@ class _HomeState extends State<HomeScreen> {
                           (context)=>const Stores(currentIndex: 2,)
                           ));
                         },
-                        child: const Icon(Icons.shopping_cart))
+                        child: const Icon(Icons.store))
                   ],
                 ),
               ),
+              Text('Welcome Frankline',style: TextStyle(
+                color: Colors.black.withOpacity(0.5)
+              ),),
+              SizedBox(height: 10,),
               Container(
                 height: 50,
                 child: TextFormField(

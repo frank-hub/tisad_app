@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tisad_shop_app/screens/cart.dart';
 import 'package:tisad_shop_app/widgets/bottomNav.dart';
 import 'package:http/http.dart' as http;
 import '../constants.dart';
 import '../models/product.dart';
+import '../providers/cart_provider.dart';
 import '../theme.dart';
 
 class ProductDetails extends StatefulWidget {
@@ -104,8 +106,10 @@ late Product product = Product();
                   IconButton(
                     icon: const Icon(Icons.shopping_cart, color: Colors.black),
                     onPressed: () {
-                      Navigator.of(context).pop();
-                    },
+                      Navigator.push(context, MaterialPageRoute(builder:
+                          (context)=> CartScreen()
+                      ));
+                      },
                   ),
                 ],
               ),
@@ -262,9 +266,13 @@ late Product product = Product();
               SizedBox(height: 60,),
               InkWell(
                 onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder:
-                  (context)=> CartScreen()
-                  ));
+                  Provider.of<CartProvider>(context, listen: false).addItem(product);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text( '${product.p_name!} added to cart'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
                 },
                 child: Container(
                   height: 50,

@@ -1,8 +1,10 @@
 // explore.dart
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tisad_shop_app/constants.dart';
 import 'package:tisad_shop_app/providers/cart_provider.dart';
+import 'package:tisad_shop_app/screens/cart.dart';
 import '../models/product.dart';
 import '../theme.dart';
 import '../widgets/bottomNav.dart';
@@ -97,7 +99,7 @@ class _ExploreState extends State<Explore> {
                       },
                     ),
                   ),
-                  SizedBox(width: 10),
+                  SizedBox(width: 5),
                   Expanded(
                     child: TextField(
                       decoration: InputDecoration(
@@ -115,13 +117,21 @@ class _ExploreState extends State<Explore> {
                       ),
                     ),
                   ),
+                  IconButton(
+                    icon: Icon(Icons.shopping_cart, color: lightColorScheme.primary),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder:
+                      (context)=> CartScreen()
+                      ));
+                    },
+                  )
                 ],
               ),
               SizedBox(height: 20),
-              Container(
-                height: 900,
-                width: double.infinity,
+              SingleChildScrollView(
                 child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: product.length,
                   itemBuilder: (context, index) {
                     return InkWell(

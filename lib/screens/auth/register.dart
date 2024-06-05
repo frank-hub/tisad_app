@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tisad_shop_app/constants.dart';
@@ -8,6 +9,7 @@ import 'package:tisad_shop_app/theme.dart';
 import 'package:tisad_shop_app/widgets/custom_scaffold.dart';
 // import 'package:icons_plus/icons_plus.dart';
 import 'package:http/http.dart' as http;
+import '../../providers/auth.dart';
 import 'login.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -18,6 +20,8 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final _auth = AuthService();
+
   final _formSignupKey = GlobalKey<FormState>();
   bool agreePersonalData = true;
   final TextEditingController _usernameController = TextEditingController();
@@ -300,14 +304,58 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         height: 30.0,
                       ),
                       // sign up social media logo
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // Logo(Logos.facebook_f),
-                          // Logo(Logos.twitter),
-                          // Logo(Logos.google),
-                          // Logo(Logos.apple),
-                        ],
+                      InkWell(
+                        onTap: () async{
+                          await _auth.loginWithGoogle();
+                          FirebaseAuth.instance.authStateChanges().listen((user) {
+                            if (user != null) {
+                              // User is signed in, navigate to HomeScreen
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => HomeScreen(currentIndex: 0,)),
+                              );
+                            }else{
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      backgroundColor: Colors.red,
+                                      content: Text('Oops Something Went Wrong'))
+                              );
+                            }
+                          });
+                        },
+                        child: Container(
+                          height: 43,
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(vertical: 8,horizontal: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.black12,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white70,
+                                offset: Offset(2.0, 2.0),
+                                blurRadius: 4.0,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image(image: AssetImage('assets/images/google.png'
+                              ),
+                                height: 30,
+                              ),
+                              SizedBox(width: 20,),
+                              Text("Sign In With Google",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black45,
+
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
                       const SizedBox(
                         height: 25.0,

@@ -30,28 +30,6 @@ class CartScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 25),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  const Text(
-                    "Shopping Cart",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.shopping_cart, color: Colors.black),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
@@ -98,7 +76,7 @@ class CartScreen extends StatelessWidget {
                           child: Text(item.product.p_name ?? ''),
                         ),
                         Container(
-                          width: 75,
+                          width: 70,
                           child: Container(
                             decoration: BoxDecoration(
                               border: Border.all(width: 0.8, color: Colors.black.withOpacity(0.8)),
@@ -111,6 +89,7 @@ class CartScreen extends StatelessWidget {
                                       width: 20,
                                       height: 30,
                                       child: TextField(
+                                        readOnly: true,
                                         controller: TextEditingController(text: item.quantity.toString()),
                                         keyboardType: TextInputType.number,
                                         onSubmitted: (value) {
@@ -138,27 +117,20 @@ class CartScreen extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-                                    Container(
-                                      width: 18,
-                                      height: 30,
-                                      color: Colors.black,
-                                      child: const Center(
-                                        child: Icon(Icons.refresh, color: Colors.white, size: 18),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 20,
-                                      height: 30,
-                                      color: Colors.red,
-                                      child: Center(
-                                        child: IconButton(
-                                          icon: const Icon(Icons.delete_forever, color: Colors.white, size: 18),
-                                          onPressed: () {
-                                            // cartProvider.removeItem(item.product.id);
-                                          },
-                                        ),
-                                      ),
-                                    ),
+
+                                    // Container(
+                                    //   width: 30,
+                                    //   height: 30,
+                                    //   color: Colors.red,
+                                    //   child: Center(
+                                    //     child: IconButton(
+                                    //       icon: const Icon(Icons.delete_forever, color: Colors.white, size: 18),
+                                    //       onPressed: () {
+                                    //         cartProvider.removeItem(item.product.id ?? 0);
+                                    //       },
+                                    //     ),
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ],

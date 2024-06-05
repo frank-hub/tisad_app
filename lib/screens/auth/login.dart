@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tisad_shop_app/constants.dart';
@@ -10,6 +11,8 @@ import 'package:tisad_shop_app/widgets/bottomNav.dart';
 import 'package:tisad_shop_app/widgets/custom_scaffold.dart';
 import 'package:http/http.dart' as http;
 
+import '../../providers/auth.dart';
+
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -18,8 +21,10 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  final _auth = AuthService();
   final _formSignInKey = GlobalKey<FormState>();
   bool rememberPassword = true;
+
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -239,21 +244,29 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       SizedBox(height: 6,),
                       InkWell(
-                        onTap: () {
-                          if (true) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Processing Data'),
-                              ),
-                            );
-
-                          } else if (!rememberPassword) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      'Please agree to the processing of personal data')),
-                            );
-                          }
+                        onTap: () async{
+                          await _auth.loginWithGoogle();
+                          FirebaseAuth.instance.authStateChanges().listen((user) {
+                            try{
+                              if (user != null) {
+                                // User is signed in, navigate to HomeScreen
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => HomeScreen(currentIndex: 0,)),
+                                );
+                              }else{
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        backgroundColor: Colors.red,
+                                        content: Text('Oops Something Went Wrong'))
+                                );
+                              }
+                            }catch(e){
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Hell'))
+                              );
+                            }
+                          });
                         },
                         child: Container(
                           height: 43,

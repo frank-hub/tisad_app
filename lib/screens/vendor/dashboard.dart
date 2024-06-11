@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:tisad_shop_app/screens/vendor/add_products.dart';
+import 'package:tisad_shop_app/screens/vendor/inventory/inventoryList.dart';
 import 'package:tisad_shop_app/screens/vendor/orders.dart';
 import 'package:tisad_shop_app/theme.dart';
 class Dashboard extends StatefulWidget {
@@ -52,8 +53,8 @@ class _DashboardState extends State<Dashboard> {
                         ));
                       },
                       child: Container(
-                        height: 145,
-                        width: 157,
+                        height:105,
+                        width: 117,
                         child: Card(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -63,7 +64,7 @@ class _DashboardState extends State<Dashboard> {
                               Text("Add New Products",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w500,
                                 color: lightColorScheme.primary
                               ),
@@ -76,12 +77,12 @@ class _DashboardState extends State<Dashboard> {
                     InkWell(
                       onTap: (){
                         Navigator.push(context, MaterialPageRoute(builder:
-                        (context)=> AllOrders()
+                            (context)=> AllOrders()
                         ));
                       },
                       child: Container(
-                        height: 145,
-                        width: 157,
+                        height: 105,
+                        width: 117,
                         child: Card(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -89,18 +90,47 @@ class _DashboardState extends State<Dashboard> {
                               Image(image: AssetImage('assets/images/Group.png')),
                               SizedBox(height: 10,),
                               Text("New Orders",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: lightColorScheme.primary
-                              ),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: lightColorScheme.primary
+                                ),
                               )
                             ],
                           ),
                         ),
                       ),
                     ),
+                    InkWell(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder:
+                            (context)=> InventoryList()
+                        ));
+                      },
+                      child: Container(
+                        height: 105,
+                        width: 117,
+                        child: Card(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image(image: AssetImage('assets/images/checklists.png')),
+                              SizedBox(height: 10,),
+                              Text("Inventory",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: lightColorScheme.primary
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
                   ],
                 ),
                 SizedBox(height: 20,),

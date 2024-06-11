@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:tisad_shop_app/constants.dart';
 import 'package:tisad_shop_app/models/category.dart';
+import 'package:tisad_shop_app/screens/cart.dart';
 import 'package:tisad_shop_app/screens/explore.dart';
 import 'package:tisad_shop_app/screens/stores.dart';
 import 'package:tisad_shop_app/screens/product_details.dart';
@@ -83,7 +84,7 @@ class _HomeState extends State<HomeScreen> {
 
     }else{
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Something Went Wrong'))
+        const SnackBar(content: Text('Something Went Wrong'))
       );
     }
   }
@@ -138,20 +139,21 @@ class _HomeState extends State<HomeScreen> {
                           fontWeight: FontWeight.w900
                         ),
                         )),
-                    InkWell(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder:
-                          (context)=>const Stores(currentIndex: 2,)
-                          ));
-                        },
-                        child: const Icon(Icons.store))
+                    IconButton(
+                      icon: const Icon(Icons.shopping_cart, color: Colors.black),
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder:
+                            (context)=> const CartScreen()
+                        ));
+                      },
+                    ),
                   ],
                 ),
               ),
               Text('Welcome Frankline',style: TextStyle(
                 color: Colors.black.withOpacity(0.5)
               ),),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               Container(
                 height: 50,
                 child: TextFormField(
@@ -173,23 +175,23 @@ class _HomeState extends State<HomeScreen> {
                 width: double.infinity,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       itemCount: categories.length,
                       itemBuilder: (context, index) {
                         final category = categories[index];
                         return GestureDetector(
                           onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Explore(currentIndex: 2)));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const Explore(currentIndex: 2)));
                           },
                           child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 5),
+                            margin: const EdgeInsets.symmetric(horizontal: 5),
                             child: Column(
                               children: [
                                 Container(
                                   height: 65,
                                   width: 65,
-                                  padding: EdgeInsets.all(5),
-                                  margin: EdgeInsets.all(5),
+                                  padding: const EdgeInsets.all(5),
+                                  margin: const EdgeInsets.all(5),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50),
                                     color: Colors.grey[200],
@@ -261,7 +263,7 @@ class _HomeState extends State<HomeScreen> {
                               ),
                               const SizedBox(height: 10,),
                               Text(new_products[index].p_name ?? 'Null',
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold
                                 ),
@@ -279,7 +281,7 @@ class _HomeState extends State<HomeScreen> {
                                   RichText(
                                     text: TextSpan(
                                         children: [
-                                          TextSpan(
+                                          const TextSpan(
                                             text: 'Ksh',
                                             style: TextStyle(
                                               color: Colors.black
@@ -287,7 +289,7 @@ class _HomeState extends State<HomeScreen> {
                                           ),
                                           TextSpan(
                                               text: new_products[index].price ?? '',
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                   fontSize: 17,
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.bold
@@ -328,188 +330,91 @@ class _HomeState extends State<HomeScreen> {
                 width: double.infinity,
                 color: Colors.grey.withOpacity(0.2),
               ),
-              Container(
-                height: 241,
-                width: double.infinity,
-                child: ListView.builder(
-                  itemCount: trendData.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    InkWell(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder:
-                            (context)=> ProductDetails(currentIndex: 2, p_index: trendData[index].id.toString() ?? '',)
-                        ));
-                      },
-                      child: Card(
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          height: 240,
-                          width: 270,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 130,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage(trend_product[index].image ?? Loader),
-                                    fit: BoxFit.cover,
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                itemCount: new_products.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10.0,
+                  mainAxisSpacing: 10.0,
+                  childAspectRatio: 0.7,
+                ),
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder:
+                          (context)=> ProductDetails(currentIndex: 2, p_index: new_products[index].id.toString() ?? '',)
+                      ));
+                    },
+                    child: Card(
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        height: 240,
+                        width: 290,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: 130,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(new_products[index].image ?? Loader),
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            const SizedBox(height: 9,),
+                            Text(new_products[index].p_name ?? 'Null',
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
+                            Text(new_products[index].category_id ?? 'Null',
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey.withOpacity(0.8)
+                              ),
+                            ),
+                            const SizedBox(height: 10,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                      children: [
+                                        const TextSpan(
+                                            text: 'Ksh',
+                                            style: TextStyle(
+                                                color: Colors.black
+                                            )
+                                        ),
+                                        TextSpan(
+                                            text: new_products[index].price ?? '',
+                                            style: const TextStyle(
+                                                fontSize: 17,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold
+                                            )
+                                        )
+                                      ]
                                   ),
-                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                              ),
-                              const SizedBox(height: 10,),
-                              Text(trend_product[0].p_name ?? 'Null',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold
-                                ),
-                              ),
-                              Text(trend_product[index].category_id ?? 'Null',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.grey.withOpacity(0.8)
-                                ),
-                              ),
-                              const SizedBox(height: 10,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  RichText(
-                                    text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                              text: 'Ksh',
-                                              style: TextStyle(
-                                                  color: Colors.black
-                                              )
-                                          ),
-                                          TextSpan(
-                                              text: trend_product[index].price ?? '',
-                                              style: TextStyle(
-                                                  fontSize: 17,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold
-                                              )
-                                          )
-                                        ]
-                                    ),
-                                  ),
-                                  const Icon(Icons.add_shopping_cart_outlined,
-                                    size: 21,
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
+                                const Icon(Icons.add_shopping_cart_outlined,
+                                  size: 21,
+                                )
+                              ],
+                            )
+                          ],
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 15,),
-              Container(
-                height: 1,
-                margin: const EdgeInsets.only(bottom: 15),
-                width: double.infinity,
-                color: Colors.grey.withOpacity(0.2),
-              ),
-              const Text('Express Shipping',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold
-                ),
-              ),
-              Container(
-                height: 1,
-                margin: const EdgeInsets.only(top: 15),
-                width: double.infinity,
-                color: Colors.grey.withOpacity(0.2),
-              ),
-              Container(
-                height: 600,
-                width: 300,
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: new_products.length,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder:
-                            (context)=> ProductDetails(currentIndex: 2, p_index: new_products[index].id.toString() ?? '',)
-                        ));
-                      },
-                      child: Card(
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          height: 240,
-                          width: 290,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 130,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage(new_products[index].image ?? Loader),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              const SizedBox(height: 10,),
-                              Text(new_products[index].p_name ?? 'Null',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold
-                                ),
-                              ),
-                              Text(new_products[index].category_id ?? 'Null',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.grey.withOpacity(0.8)
-                                ),
-                              ),
-                              const SizedBox(height: 10,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  RichText(
-                                    text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                              text: 'Ksh',
-                                              style: TextStyle(
-                                                  color: Colors.black
-                                              )
-                                          ),
-                                          TextSpan(
-                                              text: new_products[index].price ?? '',
-                                              style: TextStyle(
-                                                  fontSize: 17,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold
-                                              )
-                                          )
-                                        ]
-                                    ),
-                                  ),
-                                  const Icon(Icons.add_shopping_cart_outlined,
-                                    size: 21,
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

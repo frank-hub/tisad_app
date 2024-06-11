@@ -129,9 +129,15 @@ class _ExploreState extends State<Explore> {
               ),
               SizedBox(height: 20),
               SingleChildScrollView(
-                child: ListView.builder(
+                child: GridView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10.0,
+                    mainAxisSpacing: 10.0,
+                    childAspectRatio: 0.7,
+                  ),
                   itemCount: product.length,
                   itemBuilder: (context, index) {
                     return InkWell(
@@ -140,7 +146,7 @@ class _ExploreState extends State<Explore> {
                       },
                       child: Card(
                         child: Container(
-                          padding: EdgeInsets.all(10),
+                          padding: EdgeInsets.all(9),
                           height: 240,
                           width: 270,
                           child: Column(
@@ -158,11 +164,16 @@ class _ExploreState extends State<Explore> {
                                 ),
                               ),
                               SizedBox(height: 10),
-                              Text(
-                                product[index].p_name ?? 'Null',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              Text(product[index].p_name.toString() ?? 'Null',
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 10),
+                              Text(product[index].category_id ?? 'Null',
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey.withOpacity(0.8)
+                                ),
+                              ),
+                              SizedBox(height: 3),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [

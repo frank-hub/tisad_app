@@ -255,10 +255,12 @@ class _SignInScreenState extends State<SignInScreen> {
                                   MaterialPageRoute(builder: (context) => HomeScreen(currentIndex: 0,)),
                                 );
                               }else{
+                                debugPrint('Check hapa');
+                                print(user);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                         backgroundColor: Colors.red,
-                                        content: Text('Oops Something Went Wrong'))
+                                        content: Text('Oops Something Went55 Wrong'))
                                 );
                               }
                             }catch(e){

@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
-import '../theme.dart';
+import 'package:http/http.dart' as http;
+import 'package:tisad_shop_app/constants.dart';
+import '../models/order.dart';
+import '../models/order_item.dart';
 
 class OrderHistory extends StatefulWidget {
   const OrderHistory({super.key});
@@ -12,6 +14,25 @@ class OrderHistory extends StatefulWidget {
 }
 
 class _OrderHistoryState extends State<OrderHistory> {
+  late Future<List<Order>> _orderHistory;
+
+  @override
+  void initState() {
+    super.initState();
+    _orderHistory = fetchOrderHistory();
+  }
+
+  Future<List<Order>> fetchOrderHistory() async {
+    final response = await http.get(Uri.parse('$BaseUrl/orders'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((order) => Order.fromJson(order)).toList();
+    } else {
+      throw Exception('Failed to load order history');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +73,7 @@ class _OrderHistoryState extends State<OrderHistory> {
                 width: double.infinity,
                 child: TextField(
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                    contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                     hintText: ' Search products...',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -61,115 +82,56 @@ class _OrderHistoryState extends State<OrderHistory> {
                       icon: Icon(Icons.filter_list),
                       onPressed: () {
                         // Handle filter icon tap
-                        // You can show a filter dialog or navigate to a filter screen here
                       },
                     ),
                   ),
                 ),
               ),
-              Container(
-                height: 900,
-                width: double.infinity,
-                child: ListView.builder(
-                  itemCount:5,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: (){
-
-                      },
-                      child: Card(
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          height: 120,
-                          width: double.infinity,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 100,
-                                width: 100,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  image: const DecorationImage(
-                                    image: AssetImage('assets/shoes.jpg'),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
+              FutureBuilder<List<Order>>(
+                future: _orderHistory,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    final orders = snapshot.data!;
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: orders.length,
+                      itemBuilder: (context, index) {
+                        var order = orders[index];
+                        return Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Total: KES ${order.totalAmount}',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              const SizedBox(width: 10,),
-
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Official Brown Shoes',
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10,),
-                                  Text('Quantity: 5',
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10,),
-                                  Row(
+                                ...order.items.map((item) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 5),
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      RichText(
-                                        text: const TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                  text: '1,800',
-                                                  style: TextStyle(
-                                                      fontSize: 17,
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.bold
-                                                  )
-                                              ),
-                                              WidgetSpan(
-                                                  child: SizedBox(width: 1,)
-                                              ),
-                                              TextSpan(
-                                                  text: 'KES',style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.black,
-                                              )
-                                              ),
-                                            ]
-                                        ),
-                                      ),
-                                      SizedBox(width: 130,),
-                                      Container(
-                                        height: 22,
-                                        width: 22,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(50),
-                                          color: lightColorScheme.primary,
-                                        ),
-                                        child: const Icon(Icons.replay_circle_filled_sharp,
-                                          size: 21,
-                                          color: Colors.white,
-                                        ),
-                                      )
+                                      Text(item.productName, style: TextStyle(fontSize: 15)),
+                                      Text('Qty: ${item.quantity}', style: TextStyle(fontSize: 15)),
+                                      Text('KES ${item.totalPrice}', style: TextStyle(fontSize: 15)),
                                     ],
-                                  )
-                                ],
-                              )
-                            ],
+                                  ),
+                                )),
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     );
-                  },
-                ),
-              )
-
+                  }
+                },
+              ),
             ],
           ),
         ),

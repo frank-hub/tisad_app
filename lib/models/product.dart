@@ -9,6 +9,7 @@ class Product{
   String? stock;
   String? image;
   String? category_id;
+  String? date;
 
   Product({
     this.id,
@@ -18,7 +19,8 @@ class Product{
     this.price,
     this.stock,
     this.image,
-    this.category_id
+    this.category_id,
+    this.date,
 });
 
   factory Product.fromJson(Map<String,dynamic> json){
@@ -30,7 +32,8 @@ class Product{
       price: json['price'],
       stock: json['stock'],
       image: json['image'],
-      category_id: json['category_id']
+      category_id: json['category_id'],
+      date: json['created_at'],
     );
   }
 }

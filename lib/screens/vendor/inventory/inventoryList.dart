@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tisad_shop_app/screens/vendor/order_details.dart';
-
+import 'package:http/http.dart' as http;
+import '../../../constants.dart';
+import '../../../models/product.dart';
 import '../../../theme.dart';
+
 class InventoryList extends StatefulWidget {
   const InventoryList({super.key});
 
@@ -11,6 +16,28 @@ class InventoryList extends StatefulWidget {
 }
 
 class _InventoryListState extends State<InventoryList> {
+  List<Product> products = [];
+
+  Future<void> _fetchInventory() async{
+    final response = await http.get(Uri.parse('$BaseUrl/product/new'));
+
+    if(response.statusCode == 200)
+    {
+      Map<String,dynamic> resData = json.decode(response.body);
+      List<dynamic> productData = resData['data'];
+
+      setState(() {
+        products = productData.map((data) => Product.fromJson(data)).toList();
+      });
+    }
+
+  }
+  @override
+  void initState(){
+    super.initState();
+    _fetchInventory();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +72,7 @@ class _InventoryListState extends State<InventoryList> {
                   child: ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 20,
+                    itemCount:products.length,
                     itemBuilder: (context, index) {
                       return InkWell(
                         onTap: (){
@@ -67,15 +94,17 @@ class _InventoryListState extends State<InventoryList> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text("#20211028-07104354",
+                                          Text("Ref #"+products[index].id.toString() ?? '' ,
                                             style: TextStyle(
                                                 color: lightColorScheme.primary,
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w500
                                             ),
                                           ),
-                                          Text("2 Nov 2021 04:24 PM",
+                                          Text(products[index].date ?? '',
                                             style: TextStyle(
                                                 color: Colors.grey,
                                                 fontSize: 12,
@@ -88,14 +117,14 @@ class _InventoryListState extends State<InventoryList> {
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text("Customer Name",
+                                          Text("Category Name",
                                             style: TextStyle(
                                                 color: Colors.grey,
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w500
                                             ),
                                           ),
-                                          Text("Ankit Gajera",
+                                          Text(products[index].category_id ?? '',
                                             style: TextStyle(
                                                 color: lightColorScheme.primary,
                                                 fontSize: 12,
@@ -115,7 +144,7 @@ class _InventoryListState extends State<InventoryList> {
                                                 fontWeight: FontWeight.w500
                                             ),
                                           ),
-                                          Text("Pajamas 67",
+                                          Text(products[index].p_name ?? '',
                                             style: TextStyle(
                                                 color: Colors.grey,
                                                 fontSize: 12,
@@ -140,7 +169,7 @@ class _InventoryListState extends State<InventoryList> {
                                                 ),
                                               ),
                                               TextSpan(
-                                                text: '230.44',
+                                                text: products[index].price ?? '',
                                                 style: TextStyle(
                                                     color: lightColorScheme.primary,
                                                     fontSize: 20,
@@ -152,7 +181,8 @@ class _InventoryListState extends State<InventoryList> {
                                       ),
                                       SizedBox(height: 30,),
                                       Image(image: AssetImage('assets/images/Group.png'),
-                                      )
+                                      ),
+
                                     ],
                                   )
                                 ],

@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tisad_shop_app/constants.dart';
+import 'package:tisad_shop_app/screens/vendor/dashboard.dart';
 import 'package:tisad_shop_app/theme.dart';
 import 'package:http/http.dart' as http;
 
@@ -106,6 +107,9 @@ class _AddProductState extends State<AddProduct> {
               content: Text('Product Posted Successfully'),
             )
         );
+        Navigator.push(context, MaterialPageRoute(builder:
+        (context)=> Dashboard()
+        ));
       } else {
 
         var responseBody = await response.stream.bytesToString();

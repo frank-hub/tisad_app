@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -5,6 +7,11 @@ import 'package:tisad_shop_app/screens/vendor/add_products.dart';
 import 'package:tisad_shop_app/screens/vendor/inventory/inventoryList.dart';
 import 'package:tisad_shop_app/screens/vendor/orders.dart';
 import 'package:tisad_shop_app/theme.dart';
+import 'package:http/http.dart' as http;
+
+import '../../constants.dart';
+import '../../models/order.dart';
+
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
 
@@ -13,6 +20,25 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  late Future<List<Order>> _orderHistory;
+
+  @override
+  void initState() {
+    super.initState();
+    _orderHistory = fetchOrderHistory();
+  }
+
+  Future<List<Order>> fetchOrderHistory() async {
+    final response = await http.get(Uri.parse('$BaseUrl/orders'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((order) => Order.fromJson(order)).toList();
+    } else {
+      throw Exception('Failed to load order history');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,116 +170,49 @@ class _DashboardState extends State<Dashboard> {
                 SizedBox(height: 10,),
                 Container(
                   height: 900,
-                  child: ListView.builder(
-                    itemCount: 10,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        width: double.infinity,
-                        height: 170,
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(13.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child:FutureBuilder<List<Order>>(
+                    future: _orderHistory,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else {
+                        final orders = snapshot.data!;
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: orders.length,
+                          itemBuilder: (context, index) {
+                            var order = orders[index];
+                            return Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Column(
-                                      children: [
-                                        Text("#20211028-07104354",
-                                          style: TextStyle(
-                                              color: lightColorScheme.primary,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500
-                                          ),
-                                        ),
-                                        Text("2 Nov 2021 04:24 PM",
-                                          style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500
-                                          ),
-                                        ),
-                                      ],
+                                    Text(
+                                      'Total: KES ${order.totalAmount}',
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                     ),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text("Customer Name",
-                                          style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500
-                                          ),
-                                        ),
-                                        Text("Ankit Gajera",
-                                          style: TextStyle(
-                                              color: lightColorScheme.primary,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text("Product Name",
-                                          style: TextStyle(
-                                              color: lightColorScheme.primary,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500
-                                          ),
-                                        ),
-                                        Text("Pajamas 67",
-                                          style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    ...order.items.map((item) => Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 5),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(item.productName, style: TextStyle(fontSize: 15)),
+                                          Text('Qty: ${item.quantity}', style: TextStyle(fontSize: 15)),
+                                          Text('KES ${item.totalPrice}', style: TextStyle(fontSize: 15)),
+                                        ],
+                                      ),
+                                    )),
                                   ],
                                 ),
-                                Column(
-                                  children: [
-                                    RichText(
-                                      text: TextSpan(
-                                          children: [
-                                            TextSpan(
-                                              text: 'Ksh.',
-                                              style: TextStyle(
-                                                  color: lightColorScheme.primary,
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w500
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: '230.44',
-                                              style: TextStyle(
-                                                  color: lightColorScheme.primary,
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w500
-                                              ),
-                                            )
-                                          ]
-                                      ),
-                                    ),
-                                    SizedBox(height: 30,),
-                                    Image(image: AssetImage('assets/images/Group.png'),
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
+                              ),
+                            );
+                          },
+                        );
+                      }
                     },
                   ),
                 )

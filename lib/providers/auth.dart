@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +16,44 @@ class AuthService {
       final cred = GoogleAuthProvider.credential(
           idToken: googleAuth?.idToken,accessToken: googleAuth?.accessToken
       );
-
+      if(googleUser != null){
+        _handleSignIn(googleUser);
+      }
       return await _auth.signInWithCredential(cred);
     }catch(e){
       print(e.toString());
     }
     return null;
+  }
+
+  Future<void> _handleSignIn(GoogleSignInAccount account) async {
+
+    final authentication = await account.authentication;
+    final idToken = authentication.idToken;
+    const String url = '$BaseUrl/google-signin';
+
+    final Map<String, String> data = {
+      'name': account.displayName.toString(),
+      'email': account.email,
+      'phone': '000000000',
+      'password': account.id,
+    };
+
+    final response = await http.post(Uri.parse(url), body: data);
+
+
+    if (response.statusCode == 200) {
+      var responseData = json.decode(response.body);
+      var token = responseData['token'];
+
+      // Store token securely on the device
+      // For example, using shared preferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', token);
+      // Store token in secure storage and navigate to home screen
+    } else {
+      print('Errrror${response.statusCode}');
+    }
   }
 
   Future<String?> loggedIn() async{

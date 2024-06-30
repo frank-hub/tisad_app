@@ -1,11 +1,59 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tisad_shop_app/screens/shipping_address.dart';
+import 'package:tisad_shop_app/constants.dart';
+import 'package:tisad_shop_app/screens/home.dart';
 import '../providers/cart_provider.dart';
+import 'shipping_address.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
+
+  Future<void> sendOrder(BuildContext context) async {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final orderItems = cartProvider.items.values.map((item) {
+      return {
+        "product_name": item.product.p_name,
+        "quantity": item.quantity,
+        "total_price": double.tryParse(item.product.price ?? '0.0')! * item.quantity,
+      };
+    }).toList();
+
+    final orderData = {
+      "items": orderItems,
+      "total_amount": cartProvider.totalAmount,
+    };
+
+    final response = await http.post(
+      Uri.parse('$BaseUrl/orders'),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode(orderData),
+    );
+
+    if (response.statusCode == 201) {
+      // Order successfully sent
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Order placed successfully!'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      Navigator.push(context, MaterialPageRoute(
+          builder: (context)=> HomeScreen(currentIndex: 0)
+      ));
+      // Optionally navigate to another screen
+    } else {
+      // Failed to send order
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.body.toString()),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,14 +62,6 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Shopping Cart"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
-            },
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -40,8 +80,6 @@ class CartScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Product Name
-
                           SizedBox(
                             width: 100,
                             child: Column(
@@ -51,12 +89,11 @@ class CartScreen extends StatelessWidget {
                                 Text(item.product.p_name ?? '', style: TextStyle(fontSize: 15)),
                                 Text(
                                   'Ksh ${double.tryParse(item.product.price ?? '')?.toStringAsFixed(2) ?? '0.00'}',
-                                  style: TextStyle(fontSize: 13,color: Colors.grey.withOpacity(0.5)),
+                                  style: TextStyle(fontSize: 13, color: Colors.grey.withOpacity(0.5)),
                                 ),
                               ],
                             ),
                           ),
-                          // Quantity Selector
                           Row(
                             children: [
                               IconButton(
@@ -79,14 +116,10 @@ class CartScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          // Unit Price
-
-                          // Total Price
                           Text(
                             'Ksh ${(double.tryParse(item.product.price ?? '')! * item.quantity).toStringAsFixed(2)}',
                             style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                           ),
-                          // Remove Item Button
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () {
@@ -100,7 +133,6 @@ class CartScreen extends StatelessWidget {
                 },
               ),
             ),
-            // Total and Checkout
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20),
               decoration: BoxDecoration(
@@ -117,7 +149,7 @@ class CartScreen extends StatelessWidget {
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        '\$${cartProvider.totalAmount.toStringAsFixed(2)}',
+                        'Ksh${cartProvider.totalAmount.toStringAsFixed(2)}',
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -152,10 +184,7 @@ class CartScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 15),
                           ),
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ShippingAddress()),
-                            );
+                            sendOrder(context);
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

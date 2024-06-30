@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tisad_shop_app/screens/auth/pin_verification.dart';
 import 'package:tisad_shop_app/screens/orderHistory.dart';
 import 'package:tisad_shop_app/screens/returnRequest.dart';
 import 'package:tisad_shop_app/screens/shipping_address.dart';
@@ -94,49 +95,21 @@ class _AccountScreenState extends State<AccountScreen> {
                       ),
                       child: Column(
                         children: [
-                          Icon(Icons.edit,
-                          size: 70,
+                          Image.asset('assets/images/account/user.png',
+                          height: 70,
+                            width: 70,
                           ),
                           SizedBox(height: 10,),
-                          Text('Edit your account information',
+                          Text('Account',
                             textAlign: TextAlign.center,
                           )
                         ],
                       ),
                     ),
-                    Container(
-                      height: 150,
-                      width:180,
-                      padding: EdgeInsets.only(top: 10),
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                              width: 1,
-                              color: Colors.grey.withOpacity(0.8)
-                          )
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(Icons.lock_reset_rounded,
-                            size: 70,
-                          ),
-                          SizedBox(height: 10,),
-                          Text('Change Password',
-                            textAlign: TextAlign.center,
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
                     InkWell(
                       onTap: (){
                         Navigator.push(context, MaterialPageRoute(builder:
-                        (context)=> ShippingAddress()
+                            (context)=> ShippingAddress()
                         ));
                       },
                       child: Container(
@@ -151,8 +124,9 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                         child: Column(
                           children: [
-                            Icon(Icons.badge_outlined,
-                              size: 70,
+                            Image(image:AssetImage('assets/images/account/id-card.png'),
+                            height: 70,
+                              width: 70,
                             ),
                             SizedBox(height: 10,),
                             Text('Modify your address book',
@@ -162,10 +136,21 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                       ),
                     ),
+                  ],
+                ),
+                SizedBox(height: 10,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
                     InkWell(
                       onTap: (){
+                        // Navigator.push(context, MaterialPageRoute(builder:
+                        // (context)=> OnBoarding()
+                        // ));
+
                         Navigator.push(context, MaterialPageRoute(builder:
-                        (context)=> OnBoarding()
+                        (context)=> PinVerificationPage()
                         ));
                       },
                       child: Container(
@@ -180,8 +165,9 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                         child: Column(
                           children: [
-                            Icon(Icons.storefront,
-                              size: 70,
+                            Image(image: AssetImage('assets/images/account/eco-market.png'),
+                            height: 70,
+                              width: 70,
                             ),
                             SizedBox(height: 10,),
                             Text('Become A Vendor',
@@ -191,10 +177,40 @@ class _AccountScreenState extends State<AccountScreen> {
                         ),
                       ),
                     ),
+                    InkWell(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder:
+                            (context)=> OrderHistory()
+                        ));
+                      },
+                      child: Container(
+                        height: 150,
+                        width:180,
+                        padding: EdgeInsets.only(top: 10),
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 1,
+                                color: Colors.grey.withOpacity(0.8)
+                            )
+                        ),
+                        child: Column(
+                          children: [
+                            Image(image: AssetImage('assets/images/account/history.png'),
+                            height: 70,
+                              width: 70,
+                            ),
+                            SizedBox(height: 10,),
+                            Text('Order History',
+                              textAlign: TextAlign.center,
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(height: 20,),
-                const Text("MY ORDERS",
+                const Text("About Tisad Shop",
                   style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold
@@ -203,73 +219,59 @@ class _AccountScreenState extends State<AccountScreen> {
                 Container(
                   height: 1,
                   width: 80,
-                  color: Colors.red,
+                  color: lightColorScheme.primary,
                 ),
                 SizedBox(height: 10,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder:
-                        (context)=> OrderHistory()
-                        ));
-                      },
-                      child: Container(
-                        height: 150,
-                        width:180,
-                        padding: EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                width: 1,
-                                color: Colors.grey.withOpacity(0.8)
-                            )
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Icons.list_alt,
-                              size: 70,
-                            ),
-                            SizedBox(height: 10,),
-                            Text('View your order history',
-                              textAlign: TextAlign.center,
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder:
-                        (context)=> ReturnRequest()
-                        ));
-                      },
-                      child: Container(
-                        height: 150,
-                        width:180,
-                        padding: EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                width: 1,
-                                color: Colors.grey.withOpacity(0.8)
-                            )
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Icons.reply,
-                              size: 70,
-                            ),
-                            SizedBox(height: 10,),
-                            Text('View your return requests',
-                              textAlign: TextAlign.center,
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Tisad Shop is Kenya`s premier multi-vendor marketplace, connecting buyers with a wide variety of quality products from trusted local vendors. We are committed to providing a seamless shopping experience with secure transactions and exceptional customer service. Discover the best of Kenya’s marketplace with Tisad Shop, your one-stop destination for fashion, electronics, home decor, and more.'),
                 ),
+                TextButton(
+                onPressed: (){},
+                    child: Text('Privacy Policy')
+                ),
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Sign Out'),
+                          content: Text('Are you sure you want to sign out?'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text('Cancel'),
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close the dialog
+                              },
+                            ),
+                            TextButton(
+                              child: Text('Sign Out'),
+                              onPressed: () {
+                                Auth // Close the dialog
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    color: Colors.grey.withOpacity(0.5),
+                    width: MediaQuery.of(context).size.width,
+                    height: 50,
+                    child: Center(
+                      child: Text(
+                        'SIGN OUT',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
               ]
           ),
         ),

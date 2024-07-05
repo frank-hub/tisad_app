@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tisad_shop_app/providers/auth.dart';
 import 'package:tisad_shop_app/screens/auth/pin_verification.dart';
 import 'package:tisad_shop_app/screens/orderHistory.dart';
 import 'package:tisad_shop_app/screens/returnRequest.dart';
@@ -17,6 +18,7 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
+  AuthService auth = AuthService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -248,7 +250,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             TextButton(
                               child: Text('Sign Out'),
                               onPressed: () {
-                                Auth // Close the dialog
+                                auth.logout();
                               },
                             ),
                           ],

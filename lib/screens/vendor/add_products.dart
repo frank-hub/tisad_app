@@ -11,6 +11,9 @@ import 'package:tisad_shop_app/constants.dart';
 import 'package:tisad_shop_app/screens/vendor/dashboard.dart';
 import 'package:tisad_shop_app/theme.dart';
 import 'package:http/http.dart' as http;
+import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class AddProduct extends StatefulWidget {
   const AddProduct({super.key});
@@ -30,6 +33,7 @@ class _AddProductState extends State<AddProduct> {
   File? _imageFile;
   String imageName = '';
   String category = 'Electronics';
+  String barcode = '';
 
   Future<void> _getImage() async {
     final status = await Permission.storage.request();
@@ -65,6 +69,34 @@ class _AddProductState extends State<AddProduct> {
   }
 
 
+  Future<void> scanBarcode() async {
+    try {
+      var result = await BarcodeScanner.scan();
+      setState(() {
+        barcode = result.rawContent;
+      });
+    } on PlatformException catch (e) {
+      if (e.code == BarcodeScanner.cameraAccessDenied) {
+        setState(() {
+          barcode = 'The user did not grant the camera permission!';
+        });
+      } else {
+        setState(() {
+          barcode = 'Unknown error: $e';
+        });
+      }
+    } on FormatException {
+      setState(() {
+        barcode = 'null (User returned using the "back"-button before scanning anything. Result)';
+      });
+    } catch (e) {
+      setState(() {
+        barcode = 'Unknown error: $e';
+      });
+    }
+  }
+
+
   Future<void> _addProduct() async {
 
     final String url = '$BaseUrl/product/store';
@@ -76,6 +108,7 @@ class _AddProductState extends State<AddProduct> {
     request.fields['stock'] = quantityController.text;
     request.fields['category_id'] = category;
     request.fields['price'] = priceController.text;
+    request.fields['barcode'] = barcode;
     // request.fields['image'] = '';
 
     final _imageFile = this._imageFile;
@@ -413,6 +446,13 @@ class _AddProductState extends State<AddProduct> {
                     //   ),
                   ],
                 ),
+                ElevatedButton(
+                  onPressed: scanBarcode,
+                  child: Text('Scan Product Barcode'),
+                ),
+                const SizedBox(
+                  height: 10.0,
+                ),
                 Row(
                   children: [
                     Checkbox(
@@ -440,10 +480,10 @@ class _AddProductState extends State<AddProduct> {
                   ],
                 ),
                 const SizedBox(
-                  height: 25.0,
+                  height: 10.0,
                 ),
                 // signup button
-
+                // Text('Scan result: $barcode\n', textAlign: TextAlign.center),
                 InkWell(
                   onTap: () {
                     _addProduct();

@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tisad_shop_app/constants.dart';
@@ -10,7 +9,6 @@ import 'package:tisad_shop_app/models/category.dart';
 import 'package:tisad_shop_app/screens/barcode_screen.dart';
 import 'package:tisad_shop_app/screens/cart.dart';
 import 'package:tisad_shop_app/screens/explore.dart';
-import 'package:tisad_shop_app/screens/stores.dart';
 import 'package:tisad_shop_app/screens/product_details.dart';
 import 'package:tisad_shop_app/widgets/bottomNav.dart';
 

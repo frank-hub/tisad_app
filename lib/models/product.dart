@@ -10,6 +10,7 @@ class Product{
   String? image;
   String? category_id;
   String? date;
+  String? barcode;
 
   Product({
     this.id,
@@ -21,6 +22,7 @@ class Product{
     this.image,
     this.category_id,
     this.date,
+    this.barcode,
 });
 
   factory Product.fromJson(Map<String,dynamic> json){
@@ -34,6 +36,7 @@ class Product{
       image: json['image'],
       category_id: json['category_id'],
       date: json['created_at'],
+      barcode: json['barcode'],
     );
   }
 }

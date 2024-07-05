@@ -4,8 +4,9 @@ import 'package:tisad_shop_app/models/order_item.dart';
 class Order {
   final List<OrderItem> items;
   final String totalAmount;
+  final int id;
 
-  Order({required this.items, required this.totalAmount});
+  Order({required this.id,required this.items, required this.totalAmount});
 
   factory Order.fromJson(Map<String, dynamic> json) {
     var itemsJson = json['items'] as List;
@@ -14,6 +15,7 @@ class Order {
     return Order(
       items: itemsList,
       totalAmount: json['total_amount'],
+      id : json['id']
     );
   }
 }

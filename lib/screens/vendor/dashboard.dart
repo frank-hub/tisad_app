@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:tisad_shop_app/screens/vendor/add_products.dart';
 import 'package:tisad_shop_app/screens/vendor/inventory/inventoryList.dart';
+import 'package:tisad_shop_app/screens/vendor/order_details.dart';
 import 'package:tisad_shop_app/screens/vendor/orders.dart';
 import 'package:tisad_shop_app/theme.dart';
 import 'package:http/http.dart' as http;
@@ -185,28 +186,49 @@ class _DashboardState extends State<Dashboard> {
                           itemCount: orders.length,
                           itemBuilder: (context, index) {
                             var order = orders[index];
-                            return Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Total: KES ${order.totalAmount}',
-                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                    ),
-                                    ...order.items.map((item) => Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 5),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            return InkWell(
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (context)=> OrderDetails()
+                                ));
+                              },
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Row(
+
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(item.productName, style: TextStyle(fontSize: 15)),
-                                          Text('Qty: ${item.quantity}', style: TextStyle(fontSize: 15)),
-                                          Text('KES ${item.totalPrice}', style: TextStyle(fontSize: 15)),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children:[
+                                              Text(
+                                                'Ref:#${order.id.toString()}',
+                                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                              ),
+                                              Text(
+                                                'Total: KES ${order.totalAmount}',
+                                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                              )
+                                            ]
+                                          ),
+                                          ...order.items.map((item) => Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 5),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text(item.productName, style: TextStyle(fontSize: 15)),
+                                                Text('Qty: ${item.quantity}', style: TextStyle(fontSize: 15)),
+                                                Text('KES ${item.totalPrice}', style: TextStyle(fontSize: 15)),
+                                              ],
+                                            ),
+                                          )),
                                         ],
                                       ),
-                                    )),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             );

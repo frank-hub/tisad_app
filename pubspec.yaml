@@ -45,6 +45,7 @@ dependencies:
   google_sign_in: ^6.2.1
   firebase_auth: ^4.19.6
   barcode_scan2: ^4.1.0
+  local_auth: ^2.1.0
 
 
 

@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
+import 'package:tisad_shop_app/constants.dart';
+import 'package:tisad_shop_app/screens/product_details.dart';
 
 class BarcodeScannerScreen extends StatefulWidget {
   @override
@@ -65,6 +70,47 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     }
   }
 
+  Future<void> searchProductByBarcode() async {
+    // Replace with your Laravel API endpoint for fetching product details
+    var apiUrl = '$BaseUrl/product/search';
+
+    try {
+      var response = await http.post(
+        Uri.parse(apiUrl),
+        body: {'barcode': barcode},
+      );
+
+      if (response.statusCode == 200) {
+        // Handle successful API response here
+        var productDetails = jsonDecode(response.body);
+        // Use productDetails to update UI or navigate to product details screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Product details fetched successfully!'),
+          ),
+        );
+        Navigator.push(context, MaterialPageRoute(builder:
+            (context)=> ProductDetails(currentIndex: 2, p_index: productDetails['id'].toString() ?? '',)
+        ));
+        
+      } else {
+        // Handle errors, if any
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to fetch product details'),
+          ),
+        );
+      }
+    } catch (e) {
+      // Handle network errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,6 +125,11 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
             ElevatedButton(
               onPressed: scanBarcode,
               child: Text('Start Barcode Scan'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: barcode.isNotEmpty ? searchProductByBarcode : null,
+              child: Text('Search for Product'),
             ),
           ],
         ),

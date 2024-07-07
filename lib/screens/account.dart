@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tisad_shop_app/providers/auth.dart';
+import 'package:tisad_shop_app/screens/auth/account_info.dart';
 import 'package:tisad_shop_app/screens/auth/pin_verification.dart';
 import 'package:tisad_shop_app/screens/orderHistory.dart';
 import 'package:tisad_shop_app/screens/returnRequest.dart';
@@ -85,27 +86,35 @@ class _AccountScreenState extends State<AccountScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      height: 150,
-                      width:180,
-                      padding: EdgeInsets.only(top: 10),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 1,
-                          color: Colors.grey.withOpacity(0.8)
-                        )
-                      ),
-                      child: Column(
-                        children: [
-                          Image.asset('assets/images/account/user.png',
-                          height: 70,
-                            width: 70,
-                          ),
-                          SizedBox(height: 10,),
-                          Text('Account',
-                            textAlign: TextAlign.center,
+                    InkWell(
+                      onTap: (){
+                        Navigator.push(context,
+                            MaterialPageRoute(
+                                builder: (context)=> AccountInfoScreen()
+                            ));
+                      },
+                      child: Container(
+                        height: 150,
+                        width:180,
+                        padding: EdgeInsets.only(top: 10),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 1,
+                            color: Colors.grey.withOpacity(0.8)
                           )
-                        ],
+                        ),
+                        child: Column(
+                          children: [
+                            Image.asset('assets/images/account/user.png',
+                            height: 70,
+                              width: 70,
+                            ),
+                            SizedBox(height: 10,),
+                            Text('Account',
+                              textAlign: TextAlign.center,
+                            )
+                          ],
+                        ),
                       ),
                     ),
                     InkWell(

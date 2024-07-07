@@ -5,7 +5,7 @@ import '../../../constants.dart';
 import '../../../models/product.dart';
 import '../../../theme.dart';
 import 'edit_products.dart';
-
+import 'package:intl/intl.dart';
 class InventoryList extends StatefulWidget {
   const InventoryList({super.key});
 
@@ -71,6 +71,9 @@ class _InventoryListState extends State<InventoryList> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: products.length,
                 itemBuilder: (context, index) {
+                  String StringPrice = products[index].price ?? '0';
+                  int IntPrice = int.parse(StringPrice);
+                  String price = NumberFormat('#,##0').format(IntPrice);
                   return InkWell(
                     onTap: () {
                       Navigator.push(
@@ -175,7 +178,7 @@ class _InventoryListState extends State<InventoryList> {
                                           ),
                                         ),
                                         TextSpan(
-                                          text: products[index].price ?? '',
+                                          text: price ?? '',
                                           style: TextStyle(
                                             color: lightColorScheme.primary,
                                             fontSize: 20,

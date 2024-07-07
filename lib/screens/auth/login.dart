@@ -4,12 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tisad_shop_app/constants.dart';
+import 'package:tisad_shop_app/screens/auth/forgot_pass.dart';
 import 'package:tisad_shop_app/screens/auth/register.dart';
 import 'package:tisad_shop_app/screens/home.dart';
 import 'package:tisad_shop_app/theme.dart';
 import 'package:tisad_shop_app/widgets/bottomNav.dart';
 import 'package:tisad_shop_app/widgets/custom_scaffold.dart';
 import 'package:http/http.dart' as http;
+import 'package:local_auth/local_auth.dart';
 
 import '../../providers/auth.dart';
 
@@ -24,60 +26,108 @@ class _SignInScreenState extends State<SignInScreen> {
   final _auth = AuthService();
   final _formSignInKey = GlobalKey<FormState>();
   bool rememberPassword = true;
+  final LocalAuthentication auth = LocalAuthentication();
+  bool _canCheckBiometrics = false;
+  bool _isAuthenticated = false;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  Future<void> _login() async{
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometrics();
+    _getStoredToken();
+  }
+
+  Future<void> _checkBiometrics() async {
+    bool canCheckBiometrics = await auth.canCheckBiometrics;
+    setState(() {
+      _canCheckBiometrics = canCheckBiometrics;
+    });
+  }
+
+  Future<void> _authenticate() async {
+    bool authenticated = false;
+    try {
+      authenticated = await auth.authenticate(
+        localizedReason: 'Scan your fingerprint to authenticate',
+        options: const AuthenticationOptions(
+          useErrorDialogs: true,
+          stickyAuth: true,
+        ),
+      );
+    } catch (e) {
+      print(e);
+    }
+    setState(() {
+      _isAuthenticated = authenticated;
+    });
+    if (authenticated) {
+      _navigateToHome();
+    }
+  }
+
+  Future<void> _getStoredToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedToken = prefs.getString('token');
+    if (storedToken != null && _canCheckBiometrics) {
+      _authenticate();
+    }
+  }
+
+  Future<void> _login() async {
     const String url = '$BaseUrl/login';
-    final Map<String ,String> data = {
-      'email' : emailController.text,
+    final Map<String, String> data = {
+      'email': emailController.text,
       'password': passwordController.text,
     };
 
-    try{
-      final response = await http.post(Uri.parse(url),body: data);
-      if(response.statusCode == 200){
+    try {
+      final response = await http.post(Uri.parse(url), body: data);
+      if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
-        if(responseData['status'] == true){
+        if (responseData['status'] == true) {
           var token = responseData['token'];
 
           // Store token securely on the device
-          // For example, using shared preferences
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('token', token);
           String? storedToken = prefs.getString('token');
           if (storedToken != null) {
             // If token exists, navigate to HomeScreen
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => HomeScreen(currentIndex: 0)),
-            );
+            _navigateToHome();
           }
-        }else{
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Invalid Credentials ,Please Try Again'))
+            const SnackBar(content: Text('Invalid Credentials, Please Try Again')),
           );
         }
-      }else{
+      } else {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Registration Failed'),
-            content: Text('Failed to register user. Please try again later.'+response.body.toString()),
+            title: const Text('Login Failed'),
+            content: Text('Failed to login. Please try again later.' + response.body.toString()),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           ),
         );
       }
-    }catch(e){
-      print('Error$e');
+    } catch (e) {
+      print('Error $e');
     }
+  }
 
+  void _navigateToHome() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomeScreen(currentIndex: 0)),
+    );
   }
 
   @override
@@ -206,6 +256,11 @@ class _SignInScreenState extends State<SignInScreen> {
                             ],
                           ),
                           GestureDetector(
+                            onTap: (){
+                              Navigator.push(context, MaterialPageRoute(builder:
+                              (context)=> ForgotPasswordScreen()
+                              ));
+                            },
                             child: Text(
                               'Forget password?',
                               style: TextStyle(
@@ -242,30 +297,36 @@ class _SignInScreenState extends State<SignInScreen> {
                           child: const Text('Sign In'),
                         ),
                       ),
-                      SizedBox(height: 6,),
+                      const SizedBox(height: 6),
+                      // if (_canCheckBiometrics)
+                      //   ElevatedButton(
+                      //     onPressed: _authenticate,
+                      //     child: const Text('Sign In with Fingerprint'),
+                      //   ),
                       InkWell(
-                        onTap: () async{
+                        onTap: () async {
                           await _auth.loginWithGoogle();
                           FirebaseAuth.instance.authStateChanges().listen((user) {
-                            try{
+                            try {
                               if (user != null) {
                                 // User is signed in, navigate to HomeScreen
                                 Navigator.pushReplacement(
                                   context,
-                                  MaterialPageRoute(builder: (context) => HomeScreen(currentIndex: 0,)),
+                                  MaterialPageRoute(builder: (context) => HomeScreen(currentIndex: 0)),
                                 );
-                              }else{
+                              } else {
                                 debugPrint('Check hapa');
                                 print(user);
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        backgroundColor: Colors.red,
-                                        content: Text('Oops Something Went55 Wrong'))
+                                  SnackBar(
+                                    backgroundColor: Colors.red,
+                                    content: Text('Oops Something Went Wrong'),
+                                  ),
                                 );
                               }
-                            }catch(e){
+                            } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Hell'))
+                                SnackBar(content: Text('Hell')),
                               );
                             }
                           });
@@ -273,7 +334,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         child: Container(
                           height: 43,
                           width: double.infinity,
-                          padding: EdgeInsets.symmetric(vertical: 8,horizontal: 10),
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             color: Colors.black12,
@@ -288,16 +349,16 @@ class _SignInScreenState extends State<SignInScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Image(image: AssetImage('assets/images/google.png'
-                              ),
+                              Image(
+                                image: AssetImage('assets/images/google.png'),
                                 height: 30,
                               ),
-                              SizedBox(width: 20,),
-                              Text("Sign In With Google",
+                              const SizedBox(width: 20),
+                              const Text(
+                                "Sign In With Google",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.black45,
-
                                 ),
                               )
                             ],

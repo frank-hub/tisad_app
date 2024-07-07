@@ -11,7 +11,7 @@ import '../widgets/bottomNav.dart';
 import 'product_details.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:intl/intl.dart';
 class Explore extends StatefulWidget {
   final int currentIndex;
 
@@ -140,6 +140,9 @@ class _ExploreState extends State<Explore> {
                   ),
                   itemCount: product.length,
                   itemBuilder: (context, index) {
+                    String StringPrice = product[index].price ?? '0';
+                    int IntPrice = int.parse(StringPrice);
+                    String price  = NumberFormat('#,##0').format(IntPrice);
                     return InkWell(
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetails(currentIndex: 2, p_index: product[index].id.toString())));
@@ -181,7 +184,7 @@ class _ExploreState extends State<Explore> {
                                     text: TextSpan(
                                       children: [
                                         TextSpan(
-                                          text: product[index].price.toString(),
+                                          text:price,
                                           style: TextStyle(fontSize: 17, color: Colors.black, fontWeight: FontWeight.bold),
                                         ),
                                         WidgetSpan(

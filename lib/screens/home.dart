@@ -17,6 +17,7 @@ import '../providers/cart_provider.dart';
 import '../theme.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   final int currentIndex;
@@ -272,6 +273,11 @@ class _HomeState extends State<HomeScreen> {
                   scrollDirection: Axis.horizontal,
                   itemCount: new_products.length,
                   itemBuilder: (context, index) {
+
+                    String priceString = new_products[index].price ?? '';
+                    int intPrice = int.parse(priceString);
+                    String price = NumberFormat('#,##0').format(intPrice);
+
                     return InkWell(
                       onTap: (){
                         Navigator.push(context, MaterialPageRoute(builder:
@@ -324,7 +330,7 @@ class _HomeState extends State<HomeScreen> {
                                             )
                                           ),
                                           TextSpan(
-                                              text: new_products[index].price ?? '',
+                                              text: price ?? '',
                                               style: const TextStyle(
                                                   fontSize: 17,
                                                   color: Colors.black,
@@ -399,6 +405,9 @@ class _HomeState extends State<HomeScreen> {
                   childAspectRatio: 0.7,
                 ),
                 itemBuilder: (context, index) {
+                  String StringPrice = new_products[index].price ?? '0';
+                  int IntPrice = int.parse(StringPrice);
+                  String trendPrice = NumberFormat('#,##0').format(IntPrice);
                   return InkWell(
                     onTap: (){
                       Navigator.push(context, MaterialPageRoute(builder:
@@ -451,7 +460,7 @@ class _HomeState extends State<HomeScreen> {
                                             )
                                         ),
                                         TextSpan(
-                                            text: new_products[index].price ?? '',
+                                            text: trendPrice ?? '',
                                             style: const TextStyle(
                                                 fontSize: 17,
                                                 color: Colors.black,

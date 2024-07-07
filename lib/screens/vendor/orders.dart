@@ -1,11 +1,12 @@
 import 'dart:convert';
-
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:tisad_shop_app/screens/vendor/order_details.dart';
 import 'package:http/http.dart' as http;
 import '../../constants.dart';
 import '../../models/order.dart';
 import '../../theme.dart';
+
 class AllOrders extends StatefulWidget {
   const AllOrders({super.key});
 
@@ -84,6 +85,16 @@ class _AllOrdersState extends State<AllOrders> {
                           itemCount: orders.length,
                           itemBuilder: (context, index) {
                             var order = orders[index];
+
+                            String StringAmount =  order.totalAmount ?? '0';
+                            double IntAmount = double.parse(StringAmount);
+                            String totalAmount = NumberFormat('#,##0').format(IntAmount);
+
+
+                            String StringPrice =  order.totalAmount ?? '0';
+                            double IntPrice = double.parse(StringAmount);
+                            String totalPrice = NumberFormat('#,##0').format(IntAmount);
+
                             return Card(
                               child: Padding(
                                 padding: const EdgeInsets.all(10),
@@ -91,7 +102,7 @@ class _AllOrdersState extends State<AllOrders> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Total: KES ${order.totalAmount}',
+                                      'Total: KES $totalAmount',
                                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                     ),
                                     ...order.items.map((item) => Padding(
@@ -101,7 +112,7 @@ class _AllOrdersState extends State<AllOrders> {
                                         children: [
                                           Text(item.productName, style: TextStyle(fontSize: 15)),
                                           Text('Qty: ${item.quantity}', style: TextStyle(fontSize: 15)),
-                                          Text('KES ${item.totalPrice}', style: TextStyle(fontSize: 15)),
+                                          Text('KES $totalPrice', style: TextStyle(fontSize: 15)),
                                         ],
                                       ),
                                     )),

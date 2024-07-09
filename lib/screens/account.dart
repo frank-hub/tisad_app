@@ -259,7 +259,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             TextButton(
                               child: Text('Sign Out'),
                               onPressed: () {
-                                auth.logout();
+                                auth.logout(context);
                               },
                             ),
                           ],

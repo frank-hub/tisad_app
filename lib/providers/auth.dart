@@ -7,8 +7,12 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:tisad_shop_app/constants.dart';
+
+import '../Onbording.dart';
 class AuthService {
   final _auth  = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
   Future<UserCredential?> loginWithGoogle() async {
     try{
       final googleUser = await GoogleSignIn().signIn();
@@ -68,23 +72,71 @@ class AuthService {
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
-    final response = await http.post(
-      Uri.parse('$BaseUrl/logout'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
+    if (token == null) {
+      print('No token found.');
+      return;
+    }
 
-    if (response.statusCode == 200) {
-      // Clear SharedPreferences
-      await prefs.remove('token');
-      // Navigate to login screen or wherever appropriate
-    } else {
-      print('$token');
+    try {
+      final response = await http.post(
+        Uri.parse('$BaseUrl/logout'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Clear SharedPreferences
+        await prefs.remove('token');
+
+        // Perform sign out operations
+        await _signOutGoogleAndFirebase(context);
+
+        if (context.mounted) {
+          // Navigate to login screen or wherever appropriate
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Onbording()),
+          );
+        }
+      } else {
+        print('Logout failed: ${response.statusCode}');
+        if (context.mounted) {
+          // Optionally show a message to the user
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Logout failed: ${response.reasonPhrase}')),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error during logout: $e');
+      if (context.mounted) {
+        // Optionally show a message to the user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred during logout')),
+        );
+      }
+    }
+  }
+
+  Future<void> _signOutGoogleAndFirebase(BuildContext context) async {
+    try {
+      // Sign out from Google
+      await _googleSignIn.signOut();
+
+      // Sign out from Firebase
+      await _auth.signOut();
+    } catch (e) {
+      print('Error signing out: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error signing out. Please try again.')),
+        );
+      }
     }
   }
 

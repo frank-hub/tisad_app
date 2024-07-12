@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tisad_shop_app/screens/thank_you.dart';
-import 'package:tisad_shop_app/screens/vendor/thank_you.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:tisad_shop_app/screens/payment_screen.dart';
+import '../constants.dart';
 import '../theme.dart';
 
 class ShippingAddress extends StatefulWidget {
@@ -12,20 +14,119 @@ class ShippingAddress extends StatefulWidget {
 }
 
 class _ShippingAddressState extends State<ShippingAddress> {
-  TextEditingController f_nameController = TextEditingController();
-  TextEditingController l_nameController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
-  TextEditingController cityController = TextEditingController();
-  TextEditingController countyController = TextEditingController();
-  TextEditingController addressController = TextEditingController();
-  TextEditingController townController = TextEditingController();
+  final TextEditingController fNameController = TextEditingController();
+  final TextEditingController lNameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController cityController = TextEditingController();
+  final TextEditingController countyController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController townController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
 
+  String email = '';
+
+
+  @override
+  void dispose() {
+    fNameController.dispose();
+    lNameController.dispose();
+    phoneController.dispose();
+    cityController.dispose();
+    countyController.dispose();
+    addressController.dispose();
+    townController.dispose();
+    emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> submitShippingDetails() async {
+    final url = Uri.parse('$BaseUrl/shipping-details');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'email': email,
+        'f_name': fNameController.text,
+        'l_name': lNameController.text,
+        'phone': phoneController.text,
+        'city': cityController.text,
+        'county': countyController.text,
+        'address': addressController.text,
+        'town': townController.text,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Successfully stored or updated
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const PaymentScreen()));
+    } else {
+      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed To Save Shipping Details'))
+      );
+    }
+  }
+
+  @override
+  void initState (){
+    super.initState();
+    fetchUser();
+  }
+
+  Future<void> fetchUser() async {
+    // Fetch user details from your API using the authentication token
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final url = Uri.parse('$BaseUrl/user');
+    final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'}
+    );
+
+    if (response.statusCode == 200) {
+      var userData = json.decode(response.body);
+      setState(() {
+        email = userData['email'];
+        fetchShippingDetails();
+      });
+
+    } else {
+      email = 'noemail@emailcom';
+    }
+  }
+
+  var shipping;
+
+  Future<Map<String, dynamic>?> fetchShippingDetails() async {
+    final url = Uri.parse('$BaseUrl/shipping-details/$email');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        setState(() {
+          shipping =  json.decode(response.body);
+        });
+
+      } else {
+        // If the server returns an error response, throw an exception.
+        throw Exception(response.statusCode);
+      }
+    } catch (e) {
+      // Catch any errors and print the error message.
+      print('Error: $e');
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Padding(
+        child: shipping == null
+        ? Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -59,15 +160,35 @@ class _ShippingAddressState extends State<ShippingAddress> {
                   height: 25.0,
                 ),
                 TextField(
-                  controller: f_nameController,
-                  onChanged: (value){
-                    setState(() {
-                      f_nameController.text = value;
-                    });
-                  },
+                  readOnly: true,
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    label: const Text('Email(Read Only)'),
+                    hintText: email,
+                    hintStyle: const TextStyle(
+                      color: Colors.red,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextField(
+                  controller: fNameController,
                   decoration: InputDecoration(
                     label: const Text('First Name'),
-                    hintText: 'Enter First Name',
                     hintStyle: const TextStyle(
                       color: Colors.black26,
                     ),
@@ -89,15 +210,9 @@ class _ShippingAddressState extends State<ShippingAddress> {
                   height: 25.0,
                 ),
                 TextField(
-                  controller: l_nameController,
-                  onChanged: (value){
-                    setState(() {
-                      l_nameController.text = value;
-                    });
-                  },
+                  controller: lNameController,
                   decoration: InputDecoration(
                     label: const Text('Last Name'),
-                    hintText: 'Enter Last Name',
                     hintStyle: const TextStyle(
                       color: Colors.black26,
                     ),
@@ -115,22 +230,13 @@ class _ShippingAddressState extends State<ShippingAddress> {
                     ),
                   ),
                 ),
-
-
-
                 const SizedBox(
                   height: 25.0,
                 ),
                 TextField(
                   controller: phoneController,
-                  onChanged: (value){
-                    setState(() {
-                      phoneController.text = value;
-                    });
-                  },
                   decoration: InputDecoration(
                     label: const Text('Phone No.'),
-                    hintText: 'Enter Phone No.',
                     hintStyle: const TextStyle(
                       color: Colors.black26,
                     ),
@@ -153,14 +259,8 @@ class _ShippingAddressState extends State<ShippingAddress> {
                 ),
                 TextField(
                   controller: cityController,
-                  onChanged: (value){
-                    setState(() {
-                      cityController.text = value;
-                    });
-                  },
                   decoration: InputDecoration(
                     label: const Text('City'),
-                    hintText: 'Enter City',
                     hintStyle: const TextStyle(
                       color: Colors.black26,
                     ),
@@ -183,14 +283,8 @@ class _ShippingAddressState extends State<ShippingAddress> {
                 ),
                 TextField(
                   controller: countyController,
-                  onChanged: (value){
-                    setState(() {
-                      countyController.text = value;
-                    });
-                  },
                   decoration: InputDecoration(
                     label: const Text('County'),
-                    hintText: 'Enter County',
                     hintStyle: const TextStyle(
                       color: Colors.black26,
                     ),
@@ -212,15 +306,10 @@ class _ShippingAddressState extends State<ShippingAddress> {
                   height: 25.0,
                 ),
                 TextField(
-                  controller: l_nameController,
-                  onChanged: (value){
-                    setState(() {
-                      l_nameController.text = value;
-                    });
-                  },
+                  controller: addressController,
                   decoration: InputDecoration(
                     label: const Text('Address Line'),
-                    hintText: 'Enter Address Line',
+                    hintText: 'Address(252-20200)',
                     hintStyle: const TextStyle(
                       color: Colors.black26,
                     ),
@@ -243,14 +332,8 @@ class _ShippingAddressState extends State<ShippingAddress> {
                 ),
                 TextField(
                   controller: townController,
-                  onChanged: (value){
-                    setState(() {
-                      townController.text = value;
-                    });
-                  },
                   decoration: InputDecoration(
                     label: const Text('Town'),
-                    hintText: 'Enter Town',
                     hintStyle: const TextStyle(
                       color: Colors.black26,
                     ),
@@ -272,14 +355,10 @@ class _ShippingAddressState extends State<ShippingAddress> {
                   height: 25.0,
                 ),
                 InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder:
-                    (context)=> ThankYouOrder()
-                    ));
-                  },
+                  onTap: submitShippingDetails,
                   child: Container(
                     height: 50,
-                    padding: EdgeInsets.symmetric(horizontal:10),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                         color: lightColorScheme.primary,
                         borderRadius: BorderRadius.circular(10)
@@ -289,7 +368,7 @@ class _ShippingAddressState extends State<ShippingAddress> {
                         text: const TextSpan(
                             children: [
                               WidgetSpan(
-                                  child: Icon(Icons.credit_card_outlined,size: 25,color: Colors.white,)
+                                  child: Icon(Icons.credit_card_outlined, size: 25, color: Colors.white,)
                               ),
                               WidgetSpan(
                                   child: SizedBox(width: 15,)
@@ -297,7 +376,9 @@ class _ShippingAddressState extends State<ShippingAddress> {
                               TextSpan(
                                   text: 'Proceed To Payment',
                                   style: TextStyle(
-                                      fontSize: 19
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white
                                   )
                               )
                             ]
@@ -305,7 +386,285 @@ class _ShippingAddressState extends State<ShippingAddress> {
                       ),
                     ),
                   ),
-                )
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+              ]
+          ),
+        )
+        :shipping.isEmpty
+        ? const Text('No Shipping Details Found')
+        : Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    const Text("Shipping Address",
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.shopping_cart, color: Colors.black),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextField(
+                  readOnly: true,
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    label: const Text('Email(Read Only)'),
+                    hintText: email,
+                    hintStyle: const TextStyle(
+                      color: Colors.red,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextField(
+                  controller: fNameController,
+                  decoration: InputDecoration(
+                    label: const Text('First Name'),
+                    hintText: shipping['f_name'] ?? '',
+                    hintStyle: const TextStyle(
+                      color: Colors.black26,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextField(
+                  controller: lNameController,
+                  decoration: InputDecoration(
+                    label: const Text('Last Name'),
+                    hintText: shipping['l_name'] ?? '',
+                    hintStyle: const TextStyle(
+                      color: Colors.black26,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextField(
+                  controller: phoneController,
+                  decoration: InputDecoration(
+                    label: const Text('Phone No.'),
+                    hintText: shipping['phone'] ?? '',
+                    hintStyle: const TextStyle(
+                      color: Colors.black26,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextField(
+                  controller: cityController,
+                  decoration: InputDecoration(
+                    label: const Text('City'),
+                    hintText: shipping['city'] ?? '',
+                    hintStyle: const TextStyle(
+                      color: Colors.black26,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextField(
+                  controller: countyController,
+                  decoration: InputDecoration(
+                    label: const Text('County'),
+                    hintText: shipping['county'] ?? '',
+                    hintStyle: const TextStyle(
+                      color: Colors.black26,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextField(
+                  controller: addressController,
+                  decoration: InputDecoration(
+                    label: const Text('Address Line'),
+                    hintText: shipping['address'] ?? '',
+                    hintStyle: const TextStyle(
+                      color: Colors.black26,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextField(
+                  controller: townController,
+                  decoration: InputDecoration(
+                    label: const Text('Town'),
+                    hintText: shipping['town'] ?? '',
+                    hintStyle: const TextStyle(
+                      color: Colors.black26,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                InkWell(
+                  onTap: submitShippingDetails,
+                  child: Container(
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                        color: lightColorScheme.primary,
+                        borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: Center(
+                      child: RichText(
+                        text: const TextSpan(
+                            children: [
+                              WidgetSpan(
+                                  child: Icon(Icons.credit_card_outlined, size: 25, color: Colors.white,)
+                              ),
+                              WidgetSpan(
+                                  child: SizedBox(width: 15,)
+                              ),
+                              TextSpan(
+                                  text: 'Proceed To Payment',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white
+                                  )
+                              )
+                            ]
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
               ]
           ),
         ),

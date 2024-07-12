@@ -26,6 +26,7 @@ class _OnBoardingState extends State<OnBoarding> {
   TextEditingController b_nameController = TextEditingController();
   TextEditingController townController = TextEditingController();
   TextEditingController cityController = TextEditingController();
+  TextEditingController pinController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController relevantDocsController = TextEditingController();
 
@@ -84,6 +85,7 @@ Future<void> CreateVendor() async{
   request.fields['email'] = email;
   request.fields['town'] = town;
   request.fields['city'] = city;
+  request.fields['pin'] =   pinController.text;
   request.fields['relevant_docs'] = relevant_docs;
   // request.fields['files'] = files;
 
@@ -125,19 +127,13 @@ Future<void> CreateVendor() async{
       emailController.clear();
       townController.clear();
       cityController.clear();
+      pinController.clear();
 
       Navigator.push(context, MaterialPageRoute(builder:
       (context)=> ThankYou()
       ));
     }else{
-      print(name);
-      print(email);
-      print(type);
-      print(b_name);
-      print(town);
-      print(city);
-      print(relevant_docs);
-      print(files);
+
       // Request failed
       var responseBody = await response.stream.bytesToString();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -204,7 +200,7 @@ Future<void> CreateVendor() async{
                   ),
                 ),
                 const SizedBox(
-                  height: 25.0,
+                  height: 10.0,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -377,6 +373,38 @@ Future<void> CreateVendor() async{
                   decoration: InputDecoration(
                     label: const Text('City'),
                     hintText: 'Enter City',
+                    hintStyle: const TextStyle(
+                      color: Colors.black26,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextField(
+                  controller: pinController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 4,
+                  onChanged: (value){
+                    setState(() {
+                      pinController.text = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    label: const Text('Login Pin'),
+                    hintText: 'Enter Login Pin',
                     hintStyle: const TextStyle(
                       color: Colors.black26,
                     ),

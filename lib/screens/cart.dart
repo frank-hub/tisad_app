@@ -11,50 +11,6 @@ import 'shipping_address.dart';
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
-  Future<void> sendOrder(BuildContext context) async {
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
-    final orderItems = cartProvider.items.values.map((item) {
-      return {
-        "product_name": item.product.p_name,
-        "quantity": item.quantity,
-        "total_price": double.tryParse(item.product.price ?? '0.0')! * item.quantity,
-      };
-    }).toList();
-
-    final orderData = {
-      "items": orderItems,
-      "total_amount": cartProvider.totalAmount,
-    };
-
-    final response = await http.post(
-      Uri.parse('$BaseUrl/orders'),
-      headers: {"Content-Type": "application/json"},
-      body: json.encode(orderData),
-    );
-
-    if (response.statusCode == 201) {
-      // Order successfully sent
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Order placed successfully!'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      Navigator.push(context, MaterialPageRoute(
-          builder: (context)=> HomeScreen(currentIndex: 0)
-      ));
-      // Optionally navigate to another screen
-    } else {
-      // Failed to send order
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(response.body.toString()),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
@@ -184,7 +140,35 @@ class CartScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 15),
                           ),
                           onPressed: () {
-                            sendOrder(context);
+                            // Navigator.push(context,
+                            //     MaterialPageRoute(builder: (context)=>const ShippingAddress())
+                            // );
+                            // hhhhhh
+                            if (cartProvider.totalAmount != 0.00) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ShippingAddress()),
+                              );
+                            } else {
+                              // Handle the case where the amount is 0.00 (e.g., show an alert)
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Alert'),
+                                    content: Text('No Items In Cart'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

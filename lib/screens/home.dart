@@ -218,7 +218,10 @@ class _HomeState extends State<HomeScreen> {
                         final category = categories[index];
                         return GestureDetector(
                           onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => const Explore(currentIndex: 2)));
+                            Navigator.push(context, MaterialPageRoute(
+                                builder: (context) => const Explore(currentIndex: 2)
+
+                            ));
                           },
                           child: Container(
                             margin: const EdgeInsets.symmetric(horizontal: 5),

@@ -1,15 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tisad_shop_app/providers/auth.dart';
 import 'package:tisad_shop_app/screens/auth/account_info.dart';
-import 'package:tisad_shop_app/screens/auth/pin_verification.dart';
 import 'package:tisad_shop_app/screens/orderHistory.dart';
-import 'package:tisad_shop_app/screens/returnRequest.dart';
 import 'package:tisad_shop_app/screens/shipping_address.dart';
 import 'package:tisad_shop_app/screens/vendor/onboarding.dart';
-
+import 'package:http/http.dart' as http;
+import '../constants.dart';
 import '../theme.dart';
 import '../widgets/bottomNav.dart';
+import 'auth/pin_verification.dart';
+
 class AccountScreen extends StatefulWidget {
   final int currentIndex;
   const AccountScreen({super.key, required this.currentIndex});
@@ -20,6 +24,61 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   AuthService auth = AuthService();
+  String email = '';
+
+  @override
+  void initState(){
+    super.initState();
+    fetchUser();
+  }
+
+  Future<void> fetchUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final url = Uri.parse('$BaseUrl/user');
+    final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'}
+    );
+
+    if (response.statusCode == 200) {
+      var userData = json.decode(response.body);
+      setState(() {
+        email = userData['email'];
+      });
+      fetchVendor(email);
+
+    } else {
+      email = 'Please Login';
+    }
+  }
+  int status = 0;
+
+  Future<void> fetchVendor(String vEmail) async{
+
+    final url = Uri.parse('$BaseUrl/vendor-verify/$vEmail');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> vendorDetail =  json.decode(response.body);
+
+        setState(() {
+          status = vendorDetail['status'];
+        });
+
+      } else {
+        // If the server returns an error response, throw an exception.
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      // Catch any errors and print the error message.
+      print('Error: $e');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,13 +215,18 @@ class _AccountScreenState extends State<AccountScreen> {
                   children: [
                     InkWell(
                       onTap: (){
-                        // Navigator.push(context, MaterialPageRoute(builder:
-                        // (context)=> OnBoarding()
-                        // ));
+                        if (status == 0) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => OnBoarding()),
+                          );
 
-                        Navigator.push(context, MaterialPageRoute(builder:
-                        (context)=> PinVerificationPage()
-                        ));
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => PinVerificationPage()),
+                          );
+                        }
                       },
                       child: Container(
                         height: 150,

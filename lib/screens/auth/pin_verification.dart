@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import 'package:tisad_shop_app/constants.dart';
@@ -18,18 +19,48 @@ class _PinVerificationPageState extends State<PinVerificationPage> {
   bool _isLoading = false;
   String _message = '';
 
+  String email = '';
+
+  @override
+  void initState(){
+    super.initState();
+    fetchUser();
+  }
+
+  Future<void> fetchUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final url = Uri.parse('$BaseUrl/user');
+    final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'}
+    );
+
+    if (response.statusCode == 200) {
+      var userData = json.decode(response.body);
+      setState(() {
+        email = userData['email'];
+      });
+
+    } else {
+      email = 'Please Login';
+    }
+  }
+
   Future<void> _verifyPin() async {
     setState(() {
       _isLoading = true;
     });
 
     final response = await http.post(
-      Uri.parse('https://hikeapi.pivotnetworks.co.ke/api/verify-pin'),
+      Uri.parse('$BaseUrl/verify-pin'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
         'pin': _pinController.text,
+        'email': email
       }),
     );
 
@@ -53,7 +84,7 @@ class _PinVerificationPageState extends State<PinVerificationPage> {
       }
     } else {
       setState(() {
-        _message = 'Error: ${response.statusCode}';
+        _message = 'Error: ${response.body}';
       });
     }
   }

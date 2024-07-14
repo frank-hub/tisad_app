@@ -319,32 +319,37 @@ class _AddProductState extends State<AddProduct> {
                 const SizedBox(
                   height: 25.0,
                 ),
-                TextFormField(
-                  controller: descController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Description';
-                    }
-                    return descController.text = value;
-                  },
-                  decoration: InputDecoration(
-                    label: const Text('Description'),
-                    hintText: 'Enter Description',
-                    hintStyle: const TextStyle(
-                      color: Colors.black26,
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        color: Colors.black12, // Default border color
+                Container(
+                  height: 100,
+                  child: TextFormField(
+                    controller: descController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Description is required';
+                      }
+                      return null; // Return null if the value is valid
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Description',
+                      hintText: 'Enter Description',
+                      hintStyle: const TextStyle(
+                        color: Colors.black26,
                       ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: lightColorScheme.primary, // Default border color
+                      border: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.black12, // Default border color
+                        ),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      borderRadius: BorderRadius.circular(10),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: lightColorScheme.primary, // Default border color
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
+                    maxLines: null, // Allow the text field to expand vertically
+                    expands: true, // Make the TextFormField take up all available vertical space
                   ),
                 ),
                 const SizedBox(
@@ -390,7 +395,7 @@ class _AddProductState extends State<AddProduct> {
                           ),
                         );
                       }).toList(),
-                      hint: Text('Hike Difficulty'),
+                      hint: Text('Categories'),
                     ),
                   ),
                 ),
@@ -490,7 +495,7 @@ class _AddProductState extends State<AddProduct> {
                   },
                   child: Container(
                     width: double.infinity,
-                    height: 70,
+                    height: 60,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: lightColorScheme.primary

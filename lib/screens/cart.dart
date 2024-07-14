@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:tisad_shop_app/constants.dart';
 import 'package:tisad_shop_app/screens/home.dart';
 import '../providers/cart_provider.dart';
+import '../theme.dart';
+import '../widgets/bottomNav.dart';
 import 'shipping_address.dart';
 
 class CartScreen extends StatelessWidget {
@@ -18,6 +20,33 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Shopping Cart"),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.store),
+            label: 'Store',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore),
+            label: 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Account',
+          ),
+        ],
+        currentIndex: 2,
+        selectedItemColor: lightColorScheme.primary,
+        unselectedItemColor: Colors.black,
+        onTap: (index) {
+          // Call the onItemTapped method from BottomNavLogic
+          BottomNavLogic.onItemTapped(context, index);
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),

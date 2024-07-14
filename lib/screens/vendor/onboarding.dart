@@ -12,6 +12,8 @@ import 'package:tisad_shop_app/screens/vendor/thank_you.dart';
 import 'package:tisad_shop_app/theme.dart';
 import 'package:http/http.dart' as http;
 
+import '../../widgets/bottomNav.dart';
+
 class OnBoarding extends StatefulWidget {
   const OnBoarding({super.key});
 
@@ -157,6 +159,34 @@ Future<void> CreateVendor() async{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.store),
+            label: 'Store',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore),
+            label: 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Account',
+          ),
+        ],
+        currentIndex: 3,
+        selectedItemColor: lightColorScheme.primary,
+        unselectedItemColor: Colors.black,
+        onTap: (index) {
+          // Call the onItemTapped method from BottomNavLogic
+          BottomNavLogic.onItemTapped(context, index);
+        },
+      ),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),

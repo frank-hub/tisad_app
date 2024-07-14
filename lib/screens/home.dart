@@ -10,6 +10,7 @@ import 'package:tisad_shop_app/screens/barcode_screen.dart';
 import 'package:tisad_shop_app/screens/cart.dart';
 import 'package:tisad_shop_app/screens/explore.dart';
 import 'package:tisad_shop_app/screens/product_details.dart';
+import 'package:tisad_shop_app/screens/productsByCategory.dart';
 import 'package:tisad_shop_app/widgets/bottomNav.dart';
 
 import '../models/product.dart';
@@ -219,7 +220,7 @@ class _HomeState extends State<HomeScreen> {
                         return GestureDetector(
                           onTap: (){
                             Navigator.push(context, MaterialPageRoute(
-                                builder: (context) => const Explore(currentIndex: 2)
+                                builder: (context) => ProductsCategory(category: category.name,)
 
                             ));
                           },

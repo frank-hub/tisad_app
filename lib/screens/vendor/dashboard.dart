@@ -3,6 +3,7 @@ import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tisad_shop_app/screens/home.dart';
 import 'package:tisad_shop_app/screens/vendor/add_products.dart';
 import 'package:tisad_shop_app/screens/vendor/inventory/inventoryList.dart';
 import 'package:tisad_shop_app/screens/vendor/order_details.dart';
@@ -98,12 +99,24 @@ class _DashboardState extends State<Dashboard> {
                       color: lightColorScheme.primary,
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.notifications_active, color: lightColorScheme.primary),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.home, color: lightColorScheme.primary),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context)=> const HomeScreen(currentIndex: 0)
+                          ));
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.notifications_active, color: lightColorScheme.primary),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  )
                 ],
               ),
               SizedBox(height: 15),

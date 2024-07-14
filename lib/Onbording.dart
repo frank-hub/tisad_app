@@ -31,81 +31,87 @@ class _OnbordingState extends State<Onbording> {
     return Scaffold(
         body: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("ShopSmart Wallet",
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(height: 80,),
+                const Text("Tisad Shop Easy",
+                style: TextStyle(
+                  fontSize: 35,
+                  fontWeight: FontWeight.bold
+                ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: const Text("Easily manage your shopping across multiples stores",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 35,
-                    fontWeight: FontWeight.bold
-                  ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: const Text("Easily manage your shopping across multiples stores",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
 
-                    ),
-                    ),
                   ),
-                  const Image(image: AssetImage('assets/images/logo.png',),
-                  height: 300,
                   ),
-                  const SizedBox(height: 200,),
-                  InkWell(
-                    onTap: (){
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder:
-                      (context)=> SignInScreen()
-                      ));
-                    },
-                    child: Container(
-                      height: 50,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.black,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const Image(image: AssetImage('assets/images/logo.png',),
+                      height: 300,
+                    ),
+                    const SizedBox(height: 100,),
+                    InkWell(
+                      onTap: (){
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder:
+                            (context)=> SignInScreen()
+                        ));
+                      },
+                      child: Container(
+                        height: 50,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color: Colors.black,
 
-                        borderRadius: BorderRadius.circular(20)
-                      ),
-                      child: const Center(
-                        child: Text("Explore",
-                        textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18
+                            borderRadius: BorderRadius.circular(20)
+                        ),
+                        child: const Center(
+                          child: Text("Explore",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 30,),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 50),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                            child: const Text("I already have an account"),
-                          onTap: (){
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder:
-                                (context)=> SignInScreen()
-                            ));
-                          },
-                        ),
-                        InkWell(
+                    const SizedBox(height: 20,),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 50),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            child: const Text("Sign In"),
                             onTap: (){
                               Navigator.pushReplacement(context, MaterialPageRoute(builder:
-                              (context)=> SignUpScreen()
+                                  (context)=> SignInScreen()
                               ));
                             },
-                            child: const Text("New Here")),
-                      ],
+                          ),
+                          InkWell(
+                              onTap: (){
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder:
+                                    (context)=> SignUpScreen()
+                                ));
+                              },
+                              child: const Text("Sign Up")),
+                        ],
+                      ),
                     ),
-                  )
+                    const SizedBox(height: 30,),
 
-                ]
-            ),
+                  ],
+                )
+
+              ]
           ),
         )
     );

@@ -15,7 +15,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
   // Dummy user data, replace with actual user data from your backend
   String username = '';
   String email = '';
-  String phoneNumber = '+1234567890';
+  String phoneNumber = '';
 
   void _showEditDialog() {
     showDialog(
@@ -66,6 +66,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
       setState(() {
         username = userData['name'];
         email = userData['email'];
+        phoneNumber = userData['phone'];
       });
 
     } else {
@@ -80,85 +81,87 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
       appBar: AppBar(
         title: Text('Account Info'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/images/user_placeholder.png'), // Replace with user's profile image
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Account Information',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage('assets/images/user_placeholder.png'), // Replace with user's profile image
               ),
-            ),
-            SizedBox(height: 20),
-            Card(
-              elevation: 4.0,
-              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-              child: ListTile(
-                leading: Icon(Icons.person, color: Theme.of(context).primaryColor),
-                title: Text('Username'),
-                subtitle: Text(username),
-              ),
-            ),
-            Card(
-              elevation: 4.0,
-              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-              child: ListTile(
-                leading: Icon(Icons.email, color: Theme.of(context).primaryColor),
-                title: Text('Email'),
-                subtitle: Text(email),
-              ),
-            ),
-            Card(
-              elevation: 4.0,
-              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-              child: ListTile(
-                leading: Icon(Icons.phone, color: Theme.of(context).primaryColor),
-                title: Text('Phone Number'),
-                subtitle: Text(phoneNumber),
-              ),
-            ),
-            SizedBox(height: 30.0),
-            ElevatedButton(
-              onPressed: _showEditDialog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: lightColorScheme.primary,
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+              SizedBox(height: 20),
+              Text(
+                'Account Information',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
-              child: Text('Edit Info',
-              style: TextStyle(
-                color: Colors.white
-              ),
-              ),
-            ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: _changePassword,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: lightColorScheme.primary,
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+              SizedBox(height: 20),
+              Card(
+                elevation: 4.0,
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                child: ListTile(
+                  leading: Icon(Icons.person, color: Theme.of(context).primaryColor),
+                  title: Text('Username'),
+                  subtitle: Text(username),
                 ),
               ),
-              child: Text('Change Password',
-              style: TextStyle(
-                color: Colors.white
+              Card(
+                elevation: 4.0,
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                child: ListTile(
+                  leading: Icon(Icons.email, color: Theme.of(context).primaryColor),
+                  title: Text('Email'),
+                  subtitle: Text(email),
+                ),
               ),
+              Card(
+                elevation: 4.0,
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                child: ListTile(
+                  leading: Icon(Icons.phone, color: Theme.of(context).primaryColor),
+                  title: Text('Phone Number'),
+                  subtitle: Text(phoneNumber),
+                ),
               ),
-            ),
-          ],
+              SizedBox(height: 30.0),
+              ElevatedButton(
+                onPressed: _showEditDialog,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: lightColorScheme.primary,
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: Text('Edit Info',
+                style: TextStyle(
+                  color: Colors.white
+                ),
+                ),
+              ),
+              SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: _changePassword,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: lightColorScheme.primary,
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: Text('Change Password',
+                style: TextStyle(
+                  color: Colors.white
+                ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -189,6 +192,35 @@ class _EditAccountInfoDialogState extends State<EditAccountInfoDialog> {
     _usernameController = TextEditingController(text: widget.username);
     _emailController = TextEditingController(text: widget.email);
     _phoneNumberController = TextEditingController(text: widget.phoneNumber);
+  }
+
+  Future<void> updateUserDetails(String username, String email, String phoneNumber) async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final url = Uri.parse('$BaseUrl/update-user'); // Replace with your API URL
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token', // Add authorization if needed
+      },
+      body: json.encode({
+        'name': username,
+        'email': email,
+        'phone': phoneNumber,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Successfully updated
+      print('User details updated');
+    } else {
+      // Handle error
+      print('Failed to update user details: ${response.statusCode}');
+      print(response.body);
+    }
   }
 
   @override
@@ -243,12 +275,18 @@ class _EditAccountInfoDialogState extends State<EditAccountInfoDialog> {
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              widget.onSave(
+              updateUserDetails(
                 _usernameController.text,
                 _emailController.text,
                 _phoneNumberController.text,
-              );
-              Navigator.pop(context);
+              ).then((_) {
+                Navigator.pop(context);
+                widget.onSave(
+                  _usernameController.text,
+                  _emailController.text,
+                  _phoneNumberController.text,
+                );
+              });
             }
           },
           child: Text('Save'),

@@ -5,7 +5,7 @@ class Product{
   String? vendor_id;
   String? p_name;
   String? description;
-  String? price;
+  int? price;
   String? stock;
   String? image;
   String? category_id;

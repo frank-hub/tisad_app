@@ -40,7 +40,7 @@ class CartProvider with ChangeNotifier {
   double get totalAmount {
     double total = 0.0;
     _items.forEach((key, cartItem) {
-      total += (double.tryParse(cartItem.product.price ?? '0.0' ) ?? 0.0) * cartItem.quantity;
+      total += (cartItem.product.price ?? 0.0) * cartItem.quantity;
     });
     return total;
   }

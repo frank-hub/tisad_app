@@ -150,7 +150,7 @@ late Product product = Product();
                                 )
                             ),
                             TextSpan(
-                                text: product.price,
+                                text: product.price.toString() ?? '0.0',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 19,

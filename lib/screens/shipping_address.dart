@@ -60,7 +60,7 @@ class _ShippingAddressState extends State<ShippingAddress> {
 
     if (response.statusCode == 200) {
       // Successfully stored or updated
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const PaymentScreen()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentScreen(phone: phoneController.text,)));
     } else {
       // Handle error
       ScaffoldMessenger.of(context).showSnackBar(

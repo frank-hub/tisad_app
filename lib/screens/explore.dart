@@ -140,9 +140,11 @@ class _ExploreState extends State<Explore> {
                   ),
                   itemCount: product.length,
                   itemBuilder: (context, index) {
-                    String StringPrice = product[index].price ?? '0';
-                    int IntPrice = int.parse(StringPrice);
-                    String price  = NumberFormat('#,##0').format(IntPrice);
+                    // String StringPrice = product[index].price ?? 0.0;
+                    // StringPrice = StringPrice.replaceAll(',', ''); // Remove commas
+                    //
+                    // int IntPrice = int.parse(StringPrice);
+                    String price  = NumberFormat('#,##0').format(product[index].price ?? 0.0);
                     return InkWell(
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetails(currentIndex: 2, p_index: product[index].id.toString())));

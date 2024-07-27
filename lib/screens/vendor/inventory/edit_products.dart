@@ -169,7 +169,7 @@ class _EditProductState extends State<EditProduct> {
     nameController.text = widget.product.p_name ?? '';
     descController.text = widget.product.description ?? '';
     quantityController.text = widget.product.stock ?? '';
-    priceController.text = widget.product.price ?? '';
+    priceController.text = widget.product.price.toString() ?? '';
     category = widget.product.category_id ?? 'Electronics';
     barcode = widget.product.barcode ?? '';
   }

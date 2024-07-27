@@ -13,7 +13,8 @@ import '../constants.dart';
 import '../providers/cart_provider.dart';
 
 class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({super.key});
+  String phone;
+  PaymentScreen({super.key ,required this.phone});
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
@@ -27,7 +28,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       return {
         "product_name": item.product.p_name,
         "quantity": item.quantity,
-        "total_price": double.tryParse(item.product.price ?? '0.0')! * item.quantity,
+        "total_price": double.tryParse(item.product.price.toString() ?? '0.0')! * item.quantity,
       };
     }).toList();
 
@@ -43,6 +44,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
 
     if (response.statusCode == 201) {
+      // Mpesa Request
+      stkPush(cartProvider.totalAmount);
       // Order successfully sent
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -50,9 +53,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           duration: Duration(seconds: 2),
         ),
       );
-      Navigator.push(context, MaterialPageRoute(builder:
-          (context)=> ThankYouOrder()
-      ));
+
       // Optionally navigate to another screen
     } else {
       // Failed to send order
@@ -64,6 +65,32 @@ class _PaymentScreenState extends State<PaymentScreen> {
       );
     }
   }
+  
+  Future<void> stkPush(double totalAmount) async{
+
+    final mpesa = {
+      "phone": widget.phone,
+      "amount": totalAmount,
+    };
+
+    final response = await http.post(
+      Uri.parse('$BaseUrl/mpesa/stkpush'),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode(mpesa),
+    );
+    if(response.statusCode == 200){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Enter Pin"))
+      );
+      Navigator.push(context, MaterialPageRoute(builder:
+          (context)=> ThankYouOrder()
+      ));
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Something went wrong"))
+      );
+    }
+  } 
 
 
   @override

@@ -145,7 +145,7 @@ class _ProductsCategoryState extends State<ProductsCategory> {
                   ),
                   itemCount: product.length,
                   itemBuilder: (context, index) {
-                    String StringPrice = product[index].price ?? '0';
+                    String StringPrice = product[index].price.toString() ?? '0';
                     int IntPrice = int.parse(StringPrice);
                     String price  = NumberFormat('#,##0').format(IntPrice);
                     return InkWell(

@@ -3,12 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tisad_shop_app/constants.dart';
-import 'package:tisad_shop_app/screens/home.dart';
 import '../providers/cart_provider.dart';
 import '../theme.dart';
 import '../widgets/bottomNav.dart';
 import 'shipping_address.dart';
+import 'package:intl/intl.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -58,6 +57,9 @@ class CartScreen extends StatelessWidget {
                 itemCount: cartProvider.items.length,
                 itemBuilder: (context, index) {
                   var item = cartProvider.items.values.toList()[index];
+                  String sPrice = item.product.price.toString() ?? '0';
+                  String price = NumberFormat('#,##0').format(item.product.price ?? 0);
+
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 10),
                     child: Padding(
@@ -73,7 +75,7 @@ class CartScreen extends StatelessWidget {
                               children: [
                                 Text(item.product.p_name ?? '', style: TextStyle(fontSize: 15)),
                                 Text(
-                                  'Ksh ${double.tryParse(item.product.price ?? '')?.toStringAsFixed(2) ?? '0.00'}',
+                                  'Ksh ${price ?? '0.00'}',
                                   style: TextStyle(fontSize: 13, color: Colors.grey.withOpacity(0.5)),
                                 ),
                               ],
@@ -102,7 +104,7 @@ class CartScreen extends StatelessWidget {
                             ],
                           ),
                           Text(
-                            'Ksh ${(double.tryParse(item.product.price ?? '')! * item.quantity).toStringAsFixed(2)}',
+                            'Ksh ${NumberFormat('#,##0').format((double.tryParse(sPrice)!  * item.quantity))}',
                             style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                           ),
                           IconButton(

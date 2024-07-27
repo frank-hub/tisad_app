@@ -278,9 +278,11 @@ class _HomeState extends State<HomeScreen> {
                   itemCount: new_products.length,
                   itemBuilder: (context, index) {
 
-                    String priceString = new_products[index].price ?? '';
-                    int intPrice = int.parse(priceString);
-                    String price = NumberFormat('#,##0').format(intPrice);
+                    // String priceString = new_products[index].price ?? 0.0;
+                    // priceString = priceString.replaceAll(',', ''); // Remove commas
+                    //
+                    // int intPrice = int.parse(priceString);
+                    String price = NumberFormat('#,##0').format(new_products[index].price ?? 0.0);
 
                     return InkWell(
                       onTap: (){
@@ -409,9 +411,11 @@ class _HomeState extends State<HomeScreen> {
                   childAspectRatio: 0.7,
                 ),
                 itemBuilder: (context, index) {
-                  String StringPrice = new_products[index].price ?? '0';
-                  int IntPrice = int.parse(StringPrice);
-                  String trendPrice = NumberFormat('#,##0').format(IntPrice);
+                  // String stringPrice = new_products[index].price ?? '0';
+                  // stringPrice = stringPrice.replaceAll(',', ''); // Remove commas
+                  // int intPrice = int.parse(stringPrice);
+                  String trendPrice = NumberFormat('#,##0').format(new_products[index].price ?? 0.0);
+
                   return InkWell(
                     onTap: (){
                       Navigator.push(context, MaterialPageRoute(builder:

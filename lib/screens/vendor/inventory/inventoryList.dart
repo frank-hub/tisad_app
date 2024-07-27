@@ -71,7 +71,7 @@ class _InventoryListState extends State<InventoryList> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: products.length,
                 itemBuilder: (context, index) {
-                  String StringPrice = products[index].price ?? '0';
+                  String StringPrice = products[index].price.toString() ?? '0';
                   int IntPrice = int.parse(StringPrice);
                   String price = NumberFormat('#,##0').format(IntPrice);
                   return InkWell(

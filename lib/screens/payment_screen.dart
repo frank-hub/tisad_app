@@ -8,7 +8,7 @@ import 'package:tisad_shop_app/screens/thank_you.dart';
 import 'package:tisad_shop_app/screens/vendor/dashboard.dart';
 import 'package:tisad_shop_app/theme.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:intl/intl.dart';
 import '../constants.dart';
 import '../providers/cart_provider.dart';
 
@@ -123,13 +123,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text('Total Payment',
+                  Text('Total Amount Payable',
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
                   SizedBox(height: 5,),
-                  Text('Ksh ${cartProvider.totalAmount.toStringAsFixed(2)}',
+                  Text('Ksh ${NumberFormat('#,##0').format(cartProvider.totalAmount)}',
                     style: TextStyle(
                         fontSize: 20,
                         color: Colors.white,
@@ -143,37 +143,63 @@ class _PaymentScreenState extends State<PaymentScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Card(
-                  color: Colors.green,
-                  child: Container(
+                Container(
+                  height: 400,
+                  width: 700,
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      // Cart Items List
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: cartProvider.items.length,
+                          itemBuilder: (context, index) {
+                            var item = cartProvider.items.values.toList()[index];
+                            String sPrice = item.product.price.toString() ?? '0';
+                            String price = NumberFormat('#,##0').format(item.product.price ?? 0);
 
-                    child: const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        // crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Paybill No: 880100",
-                            style: TextStyle(
-                              color: Colors.white,
-
-                            ),
-                          ),
-                          SizedBox(height: 10,),
-                          Text("Account number: 6068010017",
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Make Payment Using The Details Above then click "confirm"-Our team will review and get back to you.'),
-                          )
-                        ],
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(
+                                      width: 100,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(item.product.p_name ?? '', style: TextStyle(fontSize: 15)),
+                                          Text(
+                                            'Ksh ${price ?? '0.00'}',
+                                            style: TextStyle(fontSize: 13, color: Colors.grey.withOpacity(0.5)),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Text(
+                                      'Ksh ${NumberFormat('#,##0').format((double.tryParse(sPrice)!  * item.quantity))}',
+                                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () {
+                                        cartProvider.removeItem(item.product.id ?? 0);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 140,),
+                const SizedBox(height: 20,),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InkWell(

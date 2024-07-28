@@ -16,7 +16,7 @@ class ShippingAddress extends StatefulWidget {
 class _ShippingAddressState extends State<ShippingAddress> {
   final TextEditingController fNameController = TextEditingController();
   final TextEditingController lNameController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController(text: '254');
   final TextEditingController cityController = TextEditingController();
   final TextEditingController countyController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
@@ -25,6 +25,22 @@ class _ShippingAddressState extends State<ShippingAddress> {
 
   String email = '';
 
+  final _formKey = GlobalKey<FormState>();
+  String? _errorMessage;
+
+  String? _validateMpesaNumber(String? value) {
+    if (value == null || value.isEmpty || !value.startsWith('+254')) {
+      return 'M-Pesa number must start with +254';
+    }
+    String numberPart = value.substring(4);
+    if (numberPart.length != 8) {
+      return 'M-Pesa number must be exactly 8 digits after +254';
+    }
+    if (!RegExp(r'^[0-8]+$').hasMatch(numberPart)) {
+      return 'M-Pesa number must contain only digits';
+    }
+    return null;
+  }
 
   @override
   void dispose() {
@@ -233,25 +249,45 @@ class _ShippingAddressState extends State<ShippingAddress> {
                 const SizedBox(
                   height: 25.0,
                 ),
-                TextField(
-                  controller: phoneController,
-                  decoration: InputDecoration(
-                    label: const Text('Phone No.'),
-                    hintStyle: const TextStyle(
-                      color: Colors.black26,
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        color: Colors.black12, // Default border color
+                // TextField(
+                //   controller: phoneController,
+                //   decoration: InputDecoration(
+                //     label: const Text('Mpesa Phone No.'),
+                //     hintText: '254',
+                //     hintStyle: const TextStyle(
+                //       color: Colors.black26,
+                //     ),
+                //     border: OutlineInputBorder(
+                //       borderSide: const BorderSide(
+                //         color: Colors.black12, // Default border color
+                //       ),
+                //       borderRadius: BorderRadius.circular(10),
+                //     ),
+                //     enabledBorder: OutlineInputBorder(
+                //       borderSide: BorderSide(
+                //         color: lightColorScheme.primary, // Default border color
+                //       ),
+                //       borderRadius: BorderRadius.circular(10),
+                //     ),
+                //   ),
+                // ),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      TextFormField(
+                        controller: phoneController,
+                        decoration: InputDecoration(
+                          labelText: 'M-Pesa Number',
+                          errorText: _errorMessage,
+                        ),
+                        keyboardType: TextInputType.phone,
+                        maxLength: 12, // +254 followed by 9 digits
+                        validator: _validateMpesaNumber,
                       ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: lightColorScheme.primary, // Default border color
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+
+                    ],
                   ),
                 ),
                 const SizedBox(
@@ -504,28 +540,48 @@ class _ShippingAddressState extends State<ShippingAddress> {
                 const SizedBox(
                   height: 25.0,
                 ),
-                TextField(
-                  controller: phoneController,
-                  decoration: InputDecoration(
-                    label: const Text('Phone No.'),
-                    hintText: shipping['phone'] ?? '',
-                    hintStyle: const TextStyle(
-                      color: Colors.black26,
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        color: Colors.black12, // Default border color
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      TextFormField(
+                        controller: phoneController,
+                        decoration: InputDecoration(
+                          labelText: 'M-Pesa Number',
+                          errorText: _errorMessage,
+                        ),
+                        keyboardType: TextInputType.phone,
+                        maxLength: 12, // +254 followed by 9 digits
+                        validator: _validateMpesaNumber,
                       ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: lightColorScheme.primary, // Default border color
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+
+                    ],
                   ),
                 ),
+
+                // TextField(
+                //   controller: phoneController,
+                //   decoration: InputDecoration(
+                //     label: const Text('Phone No.'),
+                //     hintText: shipping['phone'] ?? '',
+                //     hintStyle: const TextStyle(
+                //       color: Colors.black26,
+                //     ),
+                //     border: OutlineInputBorder(
+                //       borderSide: const BorderSide(
+                //         color: Colors.black12, // Default border color
+                //       ),
+                //       borderRadius: BorderRadius.circular(10),
+                //     ),
+                //     enabledBorder: OutlineInputBorder(
+                //       borderSide: BorderSide(
+                //         color: lightColorScheme.primary, // Default border color
+                //       ),
+                //       borderRadius: BorderRadius.circular(10),
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(
                   height: 25.0,
                 ),

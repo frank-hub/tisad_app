@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tisad_shop_app/constants.dart';
@@ -219,10 +220,14 @@ class _HomeState extends State<HomeScreen> {
                         final category = categories[index];
                         return GestureDetector(
                           onTap: (){
-                            Navigator.push(context, MaterialPageRoute(
-                                builder: (context) => ProductsCategory(category: category.name,)
+                            Navigator.push(context, PageTransition(
+                                type: PageTransitionType.fade, child: ProductsCategory(category: category.name,))
+                            );
 
-                            ));
+                            // Navigator.push(context, MaterialPageRoute(
+                            //     builder: (context) =>
+                            //
+                            // ));
                           },
                           child: Container(
                             margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -286,9 +291,10 @@ class _HomeState extends State<HomeScreen> {
 
                     return InkWell(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder:
-                            (context)=> ProductDetails(currentIndex: 2, p_index: new_products[index].id.toString() ?? '',)
-                        ));
+                        Navigator.push(context,
+                            // MaterialPageRoute(builder: (context)=> ProductDetails(currentIndex: 2, p_index: new_products[index].id.toString() ?? '',))
+                            PageTransition(type: PageTransitionType.fade, child: ProductDetails(currentIndex: 2, p_index: new_products[index].id.toString() ?? '',))
+                        );
                       },
                       child: Card(
                         child: Container(
@@ -418,9 +424,12 @@ class _HomeState extends State<HomeScreen> {
 
                   return InkWell(
                     onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder:
-                          (context)=> ProductDetails(currentIndex: 2, p_index: new_products[index].id.toString() ?? '',)
-                      ));
+                      Navigator.push(context,
+                          // MaterialPageRoute(builder:
+                          // (context)=> ProductDetails(currentIndex: 2, p_index: new_products[index].id.toString() ?? '',))
+                          PageTransition(type: PageTransitionType.fade, child: ProductDetails(currentIndex: 2, p_index: new_products[index].id.toString() ?? '',))
+
+                      );
                     },
                     child: Card(
                       child: Container(

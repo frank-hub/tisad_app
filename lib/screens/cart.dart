@@ -121,7 +121,7 @@ class CartScreen extends StatelessWidget {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 10),
               decoration: BoxDecoration(
                 color: const Color(0xffEEEEEE),
                 borderRadius: BorderRadius.circular(10),
@@ -136,7 +136,7 @@ class CartScreen extends StatelessWidget {
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        'Ksh${cartProvider.totalAmount.toStringAsFixed(2)}',
+                        'Ksh${NumberFormat('#,##0').format(cartProvider.totalAmount)}',
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ],

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -29,10 +28,13 @@ class _AddProductState extends State<AddProduct> {
   TextEditingController quantityController = TextEditingController();
   TextEditingController catController = TextEditingController();
   TextEditingController priceController = TextEditingController();
+  TextEditingController modelController = TextEditingController();
+  TextEditingController brandController = TextEditingController();
   int? vendorId ;
   File? _imageFile;
   String imageName = '';
   String category = 'Electronics';
+  String availability = 'In Stock';
   String barcode = '';
 
   Future<void> _getImage() async {
@@ -106,7 +108,10 @@ class _AddProductState extends State<AddProduct> {
     request.fields['p_name'] = nameController.text;
     request.fields['description'] = descController.text;
     request.fields['stock'] = quantityController.text;
+    request.fields['model'] = modelController.text;
+    request.fields['brand'] = brandController.text;
     request.fields['category_id'] = category;
+    request.fields['availability'] = availability;
     request.fields['price'] = priceController.text;
     request.fields['barcode'] = barcode;
     // request.fields['image'] = '';
@@ -286,6 +291,68 @@ class _AddProductState extends State<AddProduct> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextFormField(
+                  controller: modelController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Model';
+                    }
+                    return modelController.text = value;
+                  },
+                  decoration: InputDecoration(
+                    label: const Text('Model'),
+                    hintText: 'Enter Model',
+                    hintStyle: const TextStyle(
+                      color: Colors.black26,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                TextFormField(
+                  controller: brandController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Brand';
+                    }
+                    return brandController.text = value;
+                  },
+                  decoration: InputDecoration(
+                    label: const Text('Brand'),
+                    hintText: 'Enter Brand',
+                    hintStyle: const TextStyle(
+                      color: Colors.black26,
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.black12, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: lightColorScheme.primary, // Default border color
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 25,),
                 TextFormField(
                   controller: priceController,
@@ -396,6 +463,40 @@ class _AddProductState extends State<AddProduct> {
                         );
                       }).toList(),
                       hint: Text('Categories'),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 25.0,
+                ),
+                Card(
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: availability,
+                      onChanged: (newValue) {
+                        setState(() {
+                          availability = newValue!;
+                        });
+                      },
+                      items: [
+                        'In Stock',
+                        'Out Of Stock',
+                      ]
+                          .map((serviceProvider) {
+                        return DropdownMenuItem<String>(
+                          value: serviceProvider,
+                          child: Text(serviceProvider,
+                            style: TextStyle(
+                                color: Color(0xff545454),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      hint: Text('In Stock'),
                     ),
                   ),
                 ),

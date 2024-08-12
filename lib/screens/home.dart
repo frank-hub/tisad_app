@@ -336,7 +336,7 @@ class _HomeState extends State<HomeScreen> {
                                     text: TextSpan(
                                         children: [
                                           const TextSpan(
-                                            text: 'Ksh',
+                                            text: 'Ksh ',
                                             style: TextStyle(
                                               color: Colors.black
                                             )
@@ -471,7 +471,7 @@ class _HomeState extends State<HomeScreen> {
                                   text: TextSpan(
                                       children: [
                                         const TextSpan(
-                                            text: 'Ksh',
+                                            text: 'Ksh ',
                                             style: TextStyle(
                                                 color: Colors.black
                                             )

@@ -94,7 +94,6 @@ Future<void> CreateVendor() async{
   // Add image file to the request
   final _imageFile = this._imageFile;
   if (_imageFile != null) {
-    print("Image uploaded file found");
     try {
       var imageStream = http.ByteStream(_imageFile.openRead());
       var length = await _imageFile.length();
@@ -107,7 +106,6 @@ Future<void> CreateVendor() async{
       }catch(e){
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('Oops Image Not Uploaded') ));
       }
-      print(multipartFile.filename);
     } catch (e) {
       print("Error uploading image: $e");
       // Handle image upload error (e.g., show a snackbar to the user)
@@ -118,6 +116,7 @@ Future<void> CreateVendor() async{
     var response = await request.send();
 
     if(response.statusCode == 200){
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Vendor Created Successfully'),
@@ -131,8 +130,11 @@ Future<void> CreateVendor() async{
       cityController.clear();
       pinController.clear();
 
+      var vendorjson = await response.stream.bytesToString();
+      var vendor = json.decode(vendorjson);
+
       Navigator.push(context, MaterialPageRoute(builder:
-      (context)=> ThankYou()
+      (context)=> ThankYou(id: vendor['data']['id'].toString(),)
       ));
     }else{
 

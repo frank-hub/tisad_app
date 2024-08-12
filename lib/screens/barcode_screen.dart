@@ -49,6 +49,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
       setState(() {
         barcode = result.rawContent;
       });
+      searchProductByBarcode();
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.cameraAccessDenied) {
         setState(() {
@@ -127,10 +128,10 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
               child: Text('Start Barcode Scan'),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: barcode.isNotEmpty ? searchProductByBarcode : null,
-              child: Text('Search for Product'),
-            ),
+            // ElevatedButton(
+            //   onPressed: barcode.isNotEmpty ? searchProductByBarcode : null,
+            //   child: Text('Search for Product'),
+            // ),
           ],
         ),
       ),

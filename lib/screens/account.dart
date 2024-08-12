@@ -25,6 +25,7 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   AuthService auth = AuthService();
   String email = '';
+  bool isLoading = false;
 
   @override
   void initState(){
@@ -33,6 +34,10 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> fetchUser() async {
+    setState(() {
+      isLoading = true;
+    });
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -48,6 +53,7 @@ class _AccountScreenState extends State<AccountScreen> {
         email = userData['email'];
       });
       fetchVendor(email);
+      isLoading = false;
 
     } else {
       email = 'Please Login';
@@ -110,36 +116,40 @@ class _AccountScreenState extends State<AccountScreen> {
           },
         ),
       body: SingleChildScrollView(
-        child: Padding(
+        child: isLoading
+        ? Container(
+          padding: EdgeInsets.only(top: 250),
+            child: Center(child: CircularProgressIndicator()))
+        :Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              const SizedBox(height: 25),
-              Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              const Text("MY ACCOUNT",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold
+                const SizedBox(height: 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    const Text("MY ACCOUNT",
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.shopping_cart, color: Colors.black),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.shopping_cart, color: Colors.black),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
                 SizedBox(height: 20,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -157,15 +167,15 @@ class _AccountScreenState extends State<AccountScreen> {
                         width:180,
                         padding: EdgeInsets.only(top: 10),
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1,
-                            color: Colors.grey.withOpacity(0.8)
-                          )
+                            border: Border.all(
+                                width: 1,
+                                color: Colors.grey.withOpacity(0.8)
+                            )
                         ),
                         child: Column(
                           children: [
                             Image.asset('assets/images/account/user.png',
-                            height: 70,
+                              height: 70,
                               width: 70,
                             ),
                             SizedBox(height: 10,),
@@ -195,7 +205,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         child: Column(
                           children: [
                             Image(image:AssetImage('assets/images/account/id-card.png'),
-                            height: 70,
+                              height: 70,
                               width: 70,
                             ),
                             SizedBox(height: 10,),
@@ -241,7 +251,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         child: Column(
                           children: [
                             Image(image: AssetImage('assets/images/account/eco-market.png'),
-                            height: 70,
+                              height: 70,
                               width: 70,
                             ),
                             SizedBox(height: 10,),
@@ -271,7 +281,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         child: Column(
                           children: [
                             Image(image: AssetImage('assets/images/account/history.png'),
-                            height: 70,
+                              height: 70,
                               width: 70,
                             ),
                             SizedBox(height: 10,),
@@ -302,7 +312,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   child: Text('Tisad Shop is Kenya`s premier multi-vendor marketplace, connecting buyers with a wide variety of quality products from trusted local vendors. We are committed to providing a seamless shopping experience with secure transactions and exceptional customer service. Discover the best of Kenya’s marketplace with Tisad Shop, your one-stop destination for fashion, electronics, home decor, and more.'),
                 ),
                 TextButton(
-                onPressed: (){},
+                    onPressed: (){},
                     child: Text('Privacy Policy')
                 ),
                 GestureDetector(

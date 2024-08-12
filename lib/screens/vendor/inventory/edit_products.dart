@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -31,10 +30,13 @@ class _EditProductState extends State<EditProduct> {
   TextEditingController quantityController = TextEditingController();
   TextEditingController catController = TextEditingController();
   TextEditingController priceController = TextEditingController();
+  TextEditingController brandController = TextEditingController();
+  TextEditingController modelController = TextEditingController();
   int? vendorId;
   File? _imageFile;
   String imageName = '';
   String category = 'Electronics';
+  String availability = 'In Stock';
   String barcode = '';
 
   Future<void> _getImage() async {
@@ -100,14 +102,17 @@ class _EditProductState extends State<EditProduct> {
   Future<void> sendEditProductDetails() async {
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('$BaseUrl/products/edit'),
+      Uri.parse('$BaseUrl/product/edit/${widget.product.id}'),
     );
 
     request.fields['vendor_id'] = vendorId.toString();
     request.fields['p_name'] = nameController.text;
     request.fields['description'] = descController.text;
     request.fields['stock'] = quantityController.text;
+    request.fields['model'] = modelController.text;
+    request.fields['brand'] = brandController.text;
     request.fields['category_id'] = category;
+    request.fields['availability'] = availability;
     request.fields['price'] = priceController.text;
     request.fields['barcode'] = barcode;
 
@@ -144,11 +149,11 @@ class _EditProductState extends State<EditProduct> {
           ),
         );
       } else {
-        var responseBody = await response.stream.bytesToString();
+        // var responseBody = await response.stream.bytesToString();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             backgroundColor: Colors.red,
-            content: Text('Edit Failed: $responseBody'),
+            content: Text('Edit Failed'),
           ),
         );
       }
@@ -169,8 +174,11 @@ class _EditProductState extends State<EditProduct> {
     nameController.text = widget.product.p_name ?? '';
     descController.text = widget.product.description ?? '';
     quantityController.text = widget.product.stock ?? '';
+    modelController.text = widget.product.model ?? '';
+    brandController.text = widget.product.brand ?? '';
     priceController.text = widget.product.price.toString() ?? '';
     category = widget.product.category_id ?? 'Electronics';
+    availability = widget.product.availability ?? 'In Stock';
     barcode = widget.product.barcode ?? '';
   }
 
@@ -217,7 +225,7 @@ class _EditProductState extends State<EditProduct> {
                   ),
                   const SizedBox(width: 20),
                   Text(
-                    "Edit Products" + vendorId.toString(),
+                    'Edit Products Ref# ${widget.product.id}',
                     style: TextStyle(
                       color: lightColorScheme.primary,
                       fontSize: 20,
@@ -268,6 +276,68 @@ class _EditProductState extends State<EditProduct> {
                 decoration: InputDecoration(
                   label: const Text('Quantity'),
                   hintText: 'Enter Quantity',
+                  hintStyle: const TextStyle(
+                    color: Colors.black26,
+                  ),
+                  border: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Colors.black12, // Default border color
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: lightColorScheme.primary, // Default border color
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 25.0,
+              ),
+              TextFormField(
+                controller: modelController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Model';
+                  }
+                  return modelController.text = value;
+                },
+                decoration: InputDecoration(
+                  label: const Text('Model'),
+                  hintText: 'Enter Model',
+                  hintStyle: const TextStyle(
+                    color: Colors.black26,
+                  ),
+                  border: OutlineInputBorder(
+                    borderSide: const BorderSide(
+                      color: Colors.black12, // Default border color
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: lightColorScheme.primary, // Default border color
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 25.0,
+              ),
+              TextFormField(
+                controller: brandController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Brand';
+                  }
+                  return brandController.text = value;
+                },
+                decoration: InputDecoration(
+                  label: const Text('Brand'),
+                  hintText: 'Enter Brand',
                   hintStyle: const TextStyle(
                     color: Colors.black26,
                   ),
@@ -386,6 +456,38 @@ class _EditProductState extends State<EditProduct> {
                       );
                     }).toList(),
                     hint: Text('Hike Difficulty'),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25.0),
+              Card(
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    value: availability,
+                    onChanged: (newValue) {
+                      setState(() {
+                        availability = newValue!;
+                      });
+                    },
+                    items: [
+                      'In Stock',
+                      'Out Of Stock',
+                    ].map((serviceProvider) {
+                      return DropdownMenuItem<String>(
+                        value: serviceProvider,
+                        child: Text(
+                          serviceProvider,
+                          style: TextStyle(
+                            color: Color(0xff545454),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    hint: Text('Availability'),
                   ),
                 ),
               ),

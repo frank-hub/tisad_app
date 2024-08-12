@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tisad_shop_app/screens/cart.dart';
 import 'package:tisad_shop_app/screens/thank_you.dart';
 import 'package:tisad_shop_app/screens/vendor/dashboard.dart';
 import 'package:tisad_shop_app/theme.dart';
@@ -22,10 +24,44 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
 
+  String user_id ='';
+
+  @override
+  void initState(){
+    super.initState();
+        fetchUser();
+  }
+  Future<void> fetchUser() async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? token = preferences.getString('token');
+
+    final url = Uri.parse('$BaseUrl/user');
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer $token'}
+    );
+
+    if (response.statusCode == 200) {
+      var userData = json.decode(response.body);
+      setState(() {
+        user_id = userData['id'].toString();
+      });
+
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please Login To Place An Order'))
+      );
+    }
+
+
+  }
+
   Future<void> sendOrder(BuildContext context) async {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     final orderItems = cartProvider.items.values.map((item) {
       return {
+        "customer_id": user_id,
+        "phone": widget.phone,
         "product_name": item.product.p_name,
         "quantity": item.quantity,
         "total_price": double.tryParse(item.product.price.toString() ?? '0.0')! * item.quantity,
@@ -35,6 +71,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final orderData = {
       "items": orderItems,
       "total_amount": cartProvider.totalAmount,
+      "customer_id": user_id,
+      "phone": widget.phone,
     };
 
     final response = await http.post(
@@ -47,14 +85,40 @@ class _PaymentScreenState extends State<PaymentScreen> {
       // Mpesa Request
       stkPush(cartProvider.totalAmount);
       // Order successfully sent
+      var message = json.decode(response.body);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Order placed successfully!'),
+          content: Text("Order placed successfully!"+ message['order']['id'].toString()),
           duration: Duration(seconds: 2),
         ),
       );
+      Future.delayed(Duration(seconds: 30), () async{
+        final res = await http.get(Uri.parse('$BaseUrl/order/payment/confirmation/${message['order']['id']}'));
 
-      // Optionally navigate to another screen
+        if(res.statusCode == 200){
+          var trans  = json.decode(res.body);
+          if(trans['TransID'].isNotEmpty){
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ThankYouOrder()),
+            );
+          }else{
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('No Payment Received'))
+            );
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CartScreen()),
+            );
+          }
+        }else{
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Something went wrong'))
+          );
+
+        }
+
+      });
     } else {
       // Failed to send order
       ScaffoldMessenger.of(context).showSnackBar(
@@ -82,9 +146,27 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Enter Pin"))
       );
-      Navigator.push(context, MaterialPageRoute(builder:
-          (context)=> ThankYouOrder()
-      ));
+
+      Map<String,dynamic> body = json.decode(response.body);
+
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text(body['CheckoutRequestID']))
+      // );
+
+      final verify = {
+        "checkoutRequestID": body['CheckoutRequestID'],
+      };
+
+      final res = await http.post(
+        Uri.parse('$BaseUrl/mpesa/verify/payment'),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(verify),
+      );
+
+      // Navigator.push(context, MaterialPageRoute(builder:
+      //     (context)=> ThankYouOrder()
+      // ));
+
     }else{
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Something went wrong"))

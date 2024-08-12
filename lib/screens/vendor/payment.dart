@@ -1,21 +1,91 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tisad_shop_app/screens/vendor/dashboard.dart';
 import 'package:tisad_shop_app/theme.dart';
+import 'package:http/http.dart' as http;
+import '../../constants.dart';
 
 class Payment extends StatefulWidget {
-  const Payment({super.key});
+  final String vendor_id;
+  const Payment({super.key,required  this.vendor_id});
 
   @override
   State<Payment> createState() => _PaymentState();
 }
 
 class _PaymentState extends State<Payment> {
+
+  final TextEditingController phoneController = TextEditingController(text: '254');
+
+  final _formKey = GlobalKey<FormState>();
+  String? _errorMessage;
+
+  String? _validateMpesaNumber(String? value) {
+    if (value == null || value.isEmpty || !value.startsWith('+254')) {
+      return 'M-Pesa number must start with +254';
+    }
+    String numberPart = value.substring(4);
+    if (numberPart.length != 8) {
+      return 'M-Pesa number must be exactly 8 digits after +254';
+    }
+    if (!RegExp(r'^[0-8]+$').hasMatch(numberPart)) {
+      return 'M-Pesa number must contain only digits';
+    }
+    return null;
+  }
+
+  Future<void> stkPush() async{
+
+    final mpesa = {
+      "phone": phoneController.text,
+      "amount": '1',
+      'vendor_id':widget.vendor_id
+    };
+    final response = await http.post(
+      Uri.parse('$BaseUrl/mpesa/vendor/stkpush'),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode(mpesa),
+    );
+    if(response.statusCode == 200){
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Enter Pin"))
+      );
+      Future.delayed(Duration(seconds: 30), () async{
+        final res = await http.get(Uri.parse('$BaseUrl/vendor/payment/confirmation/${widget.vendor_id}'));
+
+        if(res.statusCode == 200){
+          var trans  = json.decode(res.body);
+          if(trans['TransID'] != null || trans['TransID'].isNotEmpty){
+            Navigator.push(context, MaterialPageRoute(builder:
+                (context)=> const Dashboard()
+            ));
+          }else{
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('No Payment Received'))
+            );
+          }
+        }else{
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(res.body))
+          );
+
+        }
+
+      });
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to initiate M-Pesa STK Push."))
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payment Details'),
+        title:  Text('Payment Details'),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -124,34 +194,53 @@ class _PaymentState extends State<Payment> {
                 ),
               ),
               const SizedBox(height: 10,),
-              Card(
-                color: Colors.green,
-                child: Container(
-
-                  child: const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      // crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Paybill No: 880100",
-                        style: TextStyle(
-                          color: Colors.white,
-
-                        ),
-                        ),
-                        SizedBox(height: 10,),
-                        Text("Account number: 6068010017",
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Make Payment Using The Details Above then click "confirm"-Our team will review and get back to you.'),
-                        )
-                      ],
+              // Card(
+              //   color: Colors.green,
+              //   child: Container(
+              //
+              //     child: const Center(
+              //       child: Column(
+              //         mainAxisAlignment: MainAxisAlignment.start,
+              //         // crossAxisAlignment: CrossAxisAlignment.start,
+              //         children: [
+              //           Text("Paybill No: 880100",
+              //           style: TextStyle(
+              //             color: Colors.white,
+              //
+              //           ),
+              //           ),
+              //           SizedBox(height: 10,),
+              //           Text("Account number: 6068010017",
+              //           style: TextStyle(
+              //             color: Colors.white,
+              //           ),
+              //           ),
+              //           Padding(
+              //             padding: EdgeInsets.all(8.0),
+              //             child: Text('Make Payment Using The Details Above then click "confirm"-Our team will review and get back to you.'),
+              //           )
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    TextFormField(
+                      controller: phoneController,
+                      decoration: InputDecoration(
+                        labelText: 'M-Pesa Number',
+                        errorText: _errorMessage,
+                      ),
+                      keyboardType: TextInputType.phone,
+                      maxLength: 12, // +254 followed by 9 digits
+                      validator: _validateMpesaNumber,
                     ),
-                  ),
+
+                  ],
                 ),
               ),
               const SizedBox(height: 140,),
@@ -159,9 +248,7 @@ class _PaymentState extends State<Payment> {
                 padding: const EdgeInsets.all(8.0),
                 child: InkWell(
                   onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder:
-                        (context)=> const Dashboard()
-                    ));
+                    stkPush();
                   },
                   child: Container(
                     height: 50,
@@ -179,7 +266,7 @@ class _PaymentState extends State<Payment> {
                         borderRadius: BorderRadius.circular(10)
                     ),
                     child: const Center(
-                      child: Text("CONFIRM",
+                      child: Text("PAY NOW",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,

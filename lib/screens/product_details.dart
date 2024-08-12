@@ -179,7 +179,7 @@ late Product product = Product();
                                   ),
                                 ),
                                 SizedBox(width: 10,),
-                                Text('In Stock',
+                                Text(product.availability ?? '',
                                   style: TextStyle(
                                       color: Colors.green,
                                       fontSize: 14,
@@ -197,7 +197,7 @@ late Product product = Product();
                                   ),
                                 ),
                                 SizedBox(width: 10,),
-                                Text('AI Courses',
+                                Text(product.brand ?? '',
                                   style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w300
@@ -214,24 +214,7 @@ late Product product = Product();
                                   ),
                                 ),
                                 SizedBox(width: 10,),
-                                Text('AI',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400
-                                  ),
-                                )
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text('Location :',
-                                  style: TextStyle(
-                                      color: lightColorScheme.primary,
-                                      fontSize: 15
-                                  ),
-                                ),
-                                SizedBox(width: 10,),
-                                Text('Nairobi',
+                                Text(product.model ?? '',
                                   style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400

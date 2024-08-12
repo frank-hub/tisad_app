@@ -1,21 +1,38 @@
-
-import 'package:tisad_shop_app/models/order_item.dart';
+import 'order_item.dart';
 
 class Order {
-  final List<OrderItem> items;
-  final String totalAmount;
   final int id;
+  final String customerId;
+  final String phone;
+  final String totalAmount;
+  final String status;
+  final String createdAt;
+  final List<OrderItem> items;
 
-  Order({required this.id,required this.items, required this.totalAmount});
+  Order({
+    required this.id,
+    required this.customerId,
+    required this.phone,
+    required this.totalAmount,
+    required this.status,
+    required this.createdAt,
+    required this.items,
+  });
 
   factory Order.fromJson(Map<String, dynamic> json) {
-    var itemsJson = json['items'] as List;
-    List<OrderItem> itemsList = itemsJson.map((i) => OrderItem.fromJson(i)).toList();
+    var list = json['order_items'] as List<dynamic>?;
+    List<OrderItem> itemList = list != null
+        ? list.map((i) => OrderItem.fromJson(i)).toList()
+        : [];  // Default to an empty list if 'order_items' is null
 
     return Order(
-      items: itemsList,
+      id: json['id'],
+      customerId: json['customer_id'],
+      phone: json['phone'],
       totalAmount: json['total_amount'],
-      id : json['id']
+      status: json['status'],
+      createdAt: json['created_at'],
+      items: itemList,
     );
   }
 }

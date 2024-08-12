@@ -7,6 +7,9 @@ class Product{
   String? description;
   int? price;
   String? stock;
+  String? brand;
+  String? model;
+  String? availability;
   String? image;
   String? category_id;
   String? date;
@@ -19,6 +22,9 @@ class Product{
     this.description,
     this.price,
     this.stock,
+    this.brand,
+    this.model,
+    this.availability,
     this.image,
     this.category_id,
     this.date,
@@ -33,6 +39,9 @@ class Product{
       description: json['description'],
       price: json['price'],
       stock: json['stock'],
+      brand: json['brand'],
+      model: json['model'],
+      availability: json['availability'],
       image: json['image'],
       category_id: json['category_id'],
       date: json['created_at'],

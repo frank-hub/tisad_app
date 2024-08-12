@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../constants.dart';
 import '../../../models/product.dart';
 import '../../../theme.dart';
@@ -15,24 +16,50 @@ class InventoryList extends StatefulWidget {
 
 class _InventoryListState extends State<InventoryList> {
   List<Product> products = [];
+  String vendorId = '0' ;
 
-  Future<void> _fetchInventory() async {
-    final response = await http.get(Uri.parse('$BaseUrl/product/new'));
+  Future<void> _fetchVendor() async {
+    // Fetch user details from your API using the authentication token
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final url = Uri.parse('$BaseUrl/user');
+    final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'}
+    );
+
+    if (response.statusCode == 200) {
+      var userData = json.decode(response.body);
+      setState(() {
+        vendorId = userData['id'].toString();
+      });
+      _fetchInventory(vendorId);
+    } else {
+      vendorId = '0';
+    }
+  }
+
+  Future<void> _fetchInventory(String vendorId) async {
+    final response = await http.get(Uri.parse('$BaseUrl/product/vendor/$vendorId'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> resData = json.decode(response.body);
       List<dynamic> productData = resData['data'];
-
       setState(() {
         products = productData.map((data) => Product.fromJson(data)).toList();
       });
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No Inventory"))
+      );
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _fetchInventory();
+    _fetchVendor();
   }
 
   @override

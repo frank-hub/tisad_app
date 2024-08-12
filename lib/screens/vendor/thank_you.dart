@@ -9,6 +9,8 @@ import 'package:tisad_shop_app/screens/vendor/payment.dart';
 import 'package:tisad_shop_app/theme.dart';
 
 class ThankYou extends StatefulWidget {
+  final String? id;
+  const ThankYou({super.key,required this.id});
   @override
   _ThankYouState createState() => _ThankYouState();
 }
@@ -78,7 +80,7 @@ class _ThankYouState extends State<ThankYou> {
                     child: InkWell(
                       onTap: (){
                         Navigator.push(context, MaterialPageRoute(builder:
-                            (context)=> Payment()
+                            (context)=> Payment(vendor_id: widget.id.toString(),)
                         ));
                       },
                       child: Container(
